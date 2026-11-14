@@ -93,6 +93,13 @@ button { cursor: pointer; }
 .kv span { color: var(--muted); }
 .kv b { text-align: right; }
 
+/* 3-D terrain */
+.t3d { display: flex; flex-direction: column; gap: 10px; }
+.t3d-wrap { position: relative; }
+.t3d-cv { width: 100%; height: 460px; display: block; border-radius: 10px; touch-action: none; cursor: grab; }
+.t3d-msg { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; border-radius: 10px; background: #0B1222; color: var(--space-muted); font-size: 14px; }
+.t3d-msg[hidden] { display: none; }
+
 /* Delay calendar */
 .cal { display: flex; flex-direction: column; gap: 12px; }
 .cal-title { display: flex; flex-direction: column; gap: 2px; }
@@ -161,4 +168,5 @@ button { cursor: pointer; }
   .gutter, .site-col { width: 112px; position: sticky; left: 0; z-index: 1; background: var(--space); }
   .site-btn .t { display: none; }
   .cal-panel { padding: 8px; }
+  .t3d-cv { height: 320px; }
 }

@@ -8,6 +8,7 @@ For every site south of 75°S: the elevation angle of the terrain skyline in 144
 
     python3 pipeline/lola_masks.py --download     # fetch the DEM once (29 MB, not committed)
     python3 pipeline/lola_masks.py                # masks -> docs/data/sites.json, hillshade -> pipeline/out/
+    python3 pipeline/lola_masks.py --patches      # 3-D terrain around each site -> docs/data/terrain/<id>.json
 
 DEM: LDEM_75S_240M.IMG (LRO LOLA GDR, product V2.0). Little-endian int16, height m = DN * 0.5 above the
 1737.4 km sphere. Polar stereographic centred on 90°S, 240 m/px (true at the pole), longitude 0 points up.
@@ -35,6 +36,10 @@ DEM_PATH = os.path.join(HERE, "dem", "LDEM_75S_240M.IMG")
 DEM_BYTES = 29062688
 SITES_JSON = os.path.join(HERE, "..", "docs", "data", "sites.json")
 HILLSHADE_PNG = os.path.join(HERE, "out", "hillshade.png")
+TERRAIN_DIR = os.path.join(HERE, "..", "docs", "data", "terrain")
+PATCH_HALF = 80        # patch = (2 * 80 + 1) samples a side, 240 m apart: 38.4 km
+PATCH_SOURCE = ("NASA LRO LOLA GDR LDEM_75S_240M (product V2.0, 240 m/px), resampled bilinearly by "
+                "pipeline/lola_masks.py --patches; written with assistance from Claude Code (Anthropic)")
 MASK_SOURCE = ("NASA LRO LOLA GDR LDEM_75S_240M (product V2.0, 240 m/px), horizon computed by "
                "pipeline/lola_masks.py: observer 2 m above the DEM, 0.25 deg azimuth step; "
                "terrain north of 75S not included")
@@ -104,6 +109,29 @@ def azimuth_distance(lat1, lon1, lat2, lon2):
     u2 = frame(lat2, lon2)[0]
     az = math.degrees(math.atan2(float(u2 @ east), float(u2 @ north))) % 360
     return az, R * math.acos(max(-1.0, min(1.0, float(u2 @ up))))
+
+
+def terrain_patch(dem, lat, lon, h0, half=PATCH_HALF, step=PX):
+    """Terrain around a site for the 3-D view, on a square grid of local east/north offsets (m).
+
+    Row 0 is the north edge, column 0 the west edge. Each sample is the point reached by walking the
+    great circle towards it; its value is the height (m) above the site's local horizontal plane through
+    the ground at the site (height h0), so the Moon's curvature is included (about -110 m at 19 km).
+    """
+    k = np.arange(-half, half + 1) * step
+    e, n = np.meshgrid(k, -k)
+    up, east, north = frame(lat, lon)
+    t, a = np.hypot(e, n) / R, np.arctan2(e, n)
+    u = (np.cos(t)[..., None] * up
+         + np.sin(t)[..., None] * (np.cos(a)[..., None] * north + np.sin(a)[..., None] * east))
+    la, lo = np.degrees(np.arcsin(u[..., 2])), np.degrees(np.arctan2(u[..., 1], u[..., 0]))
+    r = 2 * R * np.tan(np.radians(90 - np.abs(la)) / 2)
+    nd = dem.shape[0]
+    col, row = r * np.sin(np.radians(lo)) / PX + nd / 2 - 0.5, -r * np.cos(np.radians(lo)) / PX + nd / 2 - 0.5
+    h, ok = bilinear(dem, col, row)
+    if not ok.all():
+        raise ValueError(f"terrain patch around ({lat}, {lon}) leaves the DEM")
+    return (R + h) * np.cos(t) - (R + h0)
 
 
 def compute_mask(dem, lat, lon, h_obs=H_OBS, n_az=N_AZ):
@@ -177,6 +205,25 @@ def write_sites(path, doc):
         f.write("\n".join(lines + [' ]', '}']) + "\n")
 
 
+def write_patches(dem):
+    """docs/data/terrain/<id>.json for every site with a mask (heights rounded to 1 m)."""
+    with open(SITES_JSON, encoding="utf-8") as f:
+        doc = json.load(f)
+    os.makedirs(TERRAIN_DIR, exist_ok=True)
+    for s in doc["sites"]:
+        if "h0_m" not in s:
+            continue
+        z = terrain_patch(dem, s["lat"], s["lon"], s["h0_m"])
+        out = {"source": PATCH_SOURCE, "id": s["id"], "lat": s["lat"], "lon": s["lon"], "h0_m": s["h0_m"],
+               "step_m": PX, "n": int(z.shape[0]),
+               "note": "rows north to south, columns west to east; metres above the site's local horizontal plane",
+               "z_m": [int(round(float(v))) for v in z.ravel()]}
+        path = os.path.join(TERRAIN_DIR, s["id"] + ".json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(out, f, separators=(",", ":"))
+        print(f"{s['id']:<12} {z.min():8.0f} .. {z.max():6.0f} m  -> {os.path.relpath(path)} ({os.path.getsize(path) // 1024} KB)")
+
+
 def main():
     if "--download" in sys.argv:
         download()
@@ -184,6 +231,9 @@ def main():
     if not os.path.exists(DEM_PATH):
         raise SystemExit("DEM not found. Run: python3 pipeline/lola_masks.py --download")
     dem = load_dem()
+    if "--patches" in sys.argv:
+        write_patches(dem)
+        return
     print(f"DEM {dem.shape[0]} x {dem.shape[1]}, heights {dem.min():.0f} .. {dem.max():.0f} m")
     print("hillshade ->", os.path.relpath(hillshade(dem)))
     with open(SITES_JSON, encoding="utf-8") as f:

@@ -11,12 +11,15 @@ Earth in view (direct link), and which site and day are best if the launch slips
 
 - **Sky view** — Sun and Earth over the local horizon, with the terrain skyline, for every 3 hours of the mission.
   Earth is drawn with its phase as seen from the site.
+- **Terrain in 3D** — 38 × 38 km of LOLA terrain around each polar site, lit from the Sun's direction at the
+  chosen time, with arrows to the Sun and Earth. Drag to turn, scroll to zoom.
 - **Readouts** — Sun and Earth elevation and azimuth, share of the solar disc visible, time to the next rise or set.
 - **Delay calendar** — sites × landing dates. Colour = how long Sun and Earth stay up together, unbroken, from touchdown.
 - **Your own point** — any latitude and longitude (smooth Moon).
 - **Horizon switch** — "LOLA terrain (240 m)" or "Smooth Moon".
 
-No install, no login, no build step: plain HTML, CSS and JavaScript in `/docs`.
+No install, no login, no build step: plain HTML, CSS and JavaScript in `/docs`. The 3-D view loads three.js
+from jsDelivr when you scroll to it; everything else works without it.
 
 ## Run it locally
 
@@ -42,6 +45,7 @@ python3 pipeline/horizons_check.py
 # 3. Terrain: download the LOLA elevation model (29 MB, not in the repository), then compute horizon masks
 .venv/bin/python pipeline/lola_masks.py --download
 .venv/bin/python pipeline/lola_masks.py
+.venv/bin/python pipeline/lola_masks.py --patches     # terrain around each site for the 3-D view
 .venv/bin/python -m unittest discover -s pipeline/tests -v
 ```
 
@@ -49,8 +53,10 @@ python3 pipeline/horizons_check.py
 |---|---|
 | `docs/sky-core.js` | All geometry: azimuth, elevation, horizon, landing score |
 | `docs/app.js` | Page state and drawing |
+| `docs/terrain3d.js` | 3-D terrain view (three.js) |
 | `docs/data/ephemeris.json` | Sub-solar and sub-Earth points and Earth distance (DE421) |
 | `docs/data/sites.json` | Sites, with ground height and a 1440-value horizon mask for sites south of 75°S |
+| `docs/data/terrain/<id>.json` | Heights around each polar site (161 × 161, 240 m apart) for the 3-D view |
 | `docs/data/horizons_check.json` | Result of the Horizons check |
 | `pipeline/horizons_out/` | Raw Horizons answers |
 | `pipeline/out/hillshade.png` | Shaded relief of the elevation model, to compare by eye with Quickmap |
@@ -95,7 +101,13 @@ table on the page recomputes our side live in the browser.
 For each site south of 75°S, `pipeline/lola_masks.py` walks along the great circle of each of 1440 azimuths
 in 120 m steps to the edge of the map, reads the height bilinearly and keeps the highest elevation angle.
 
-Tests (`pipeline/tests/`): a flat map gives the 2 m dip (−0.0869°) in every direction; latitude/longitude →
+For the 3-D view, `--patches` resamples the same model on a 161 × 161 grid around each site (240 m apart),
+as heights above the site's horizontal plane, so the Moon's curvature is included. Seen from the site, the
+horizon of that patch never rises above the full mask, and a patch mirrored east–west would (checked once
+for IM-2: 541 of 1440 directions).
+
+Tests (`pipeline/tests/`): a flat map gives the 2 m dip (−0.0869°) in every direction, and a flat patch
+follows the sphere; latitude/longitude →
 pixel → latitude/longitude returns to the same point; the centre of Shackleton crater is 3.9 km below a
 10 km ring around it and sees a 20–24° horizon all round; a synthetic hill at the IM-2 site appears at the
 right azimuth (191.85°) and height from a point near the pole 167 km away. That hill is a 20 km block: a 1 km
@@ -117,6 +129,8 @@ The Shackleton and hillshade tests need the downloaded elevation model and are s
 - **Each site is one point, not a region.** Near ridges, a point a few hundred metres away can see a quite
   different horizon, so a row in the calendar describes that point only. The Bussey point above shows how large
   the difference can be.
+- **3-D view.** Only terrain inside the 38 km square casts shadows there; the Sun and Earth figures elsewhere on
+  the page use the whole horizon to the edge of the map. Arrows and Sun/Earth markers are not to scale.
 - **Line of sight only.** Ground-station schedules, relay satellites, slopes, shadows on the lander itself
   and thermal limits are not modelled.
 - **Artemis points are ours.** We did not find published centre points for the candidate regions.
@@ -124,7 +138,7 @@ The Shackleton and hillshade tests need the downloaded elevation model and are s
 ## Use of AI
 
 This project was built during the hackathon with Claude and Claude Code (Anthropic). AI wrote the page
-(`docs/`), the calculation core, the ephemeris script, the Horizons check and the terrain script and tests,
+(`docs/`, including the 3-D view), the calculation core, the ephemeris script, the Horizons check and the terrain script and tests,
 and drafted this README. Site coordinates were researched with AI help and checked against LROC
 landing-site images. Every file written with AI says so in its first lines, and every JSON data file has a
 `source` field. The team chose the question, the sites and the design, and reviewed the results.
@@ -153,4 +167,5 @@ Papers:
   topography. *Icarus* 208, 558.
 
 Libraries: `numpy`, `jplephem`, `de421` (pipeline only). Fonts: Inter and Space Grotesk (Google Fonts).
-The page itself uses no JavaScript libraries.
+The page uses one JavaScript library, three.js (MIT licence, https://threejs.org/, version 0.160.0 from
+https://cdn.jsdelivr.net/npm/three@0.160.0/), for the 3-D terrain view only.

@@ -26,6 +26,16 @@ class FlatMoon(unittest.TestCase):
         self.assertTrue(np.all(np.abs(mask - dip) < 0.0005))
 
 
+    def test_1b_flat_patch_is_the_curved_sphere(self):
+        z = lm.terrain_patch(np.zeros((N, N), np.float32), -85.0, 30.0, 0.0, half=10)
+        e = 10 * lm.PX * math.sqrt(2)                       # corner distance
+        expect = lm.R * math.cos(e / lm.R) - lm.R
+        print(f"  flat patch: centre {z[10, 10]:.3f} m, corner {z[0, 0]:.3f} m (sphere {expect:.3f} m)")
+        self.assertAlmostEqual(z[10, 10], 0.0, places=6)
+        self.assertAlmostEqual(z[0, 0], expect, places=3)
+        self.assertAlmostEqual(z[0, 0], z[-1, -1], places=6)
+
+
 class Projection(unittest.TestCase):
     def test_2_round_trip_within_1_m(self):
         worst = 0.0

@@ -381,6 +381,7 @@ function renderNow() {
   $('sunGlyph').innerHTML = sunGlyph(sClr);
   $('earthGlyph').innerHTML = earthGlyph(phase, earthUp);
 
+  render3d();
   drawLane($('laneSun'), (j) => S.sClr[j] >= 0, '#FFC24B');
   drawLane($('laneEarth'), (j) => S.eClr[j] >= thr, '#6CB6FF');
 }
@@ -443,6 +444,38 @@ async function renderVerification() {
   $('vnote').textContent = (allOk ? 'All ' + hz.rows.length + ' checks within ' + tol + '°' : 'Some checks are outside ' + tol + '°') + '; largest difference ' + worst.toFixed(4) + '°. ' +
     'Mean Sun-azimuth difference (this page − Horizons): ' + (meanSun >= 0 ? '+' : '−') + Math.abs(meanSun).toFixed(4) + '°, same sign at every point. Horizons gives apparent positions; our ephemeris is geometric. Adding light-time and aberration of light (about 0.0057°) to our Sun direction removes the offset (checked once, outside the page). ' +
     sites.join('; ') + '. Horizons answers fetched ' + hz.checked + ' by pipeline/horizons_check.py (raw files are in the repository).';
+}
+
+// ---------- 3-D terrain (three.js, loaded when the section first comes into view) ----------
+let view3d = null, want3d = false, starting3d = false, failed3d = false, site3d = null, loading3d = null;
+const patchCache = new Map();
+function msg3d(text) { $('t3dMsg').textContent = text; $('t3dMsg').hidden = !text; }
+function render3d() {
+  const s = curSite();
+  $('t3dTitle').textContent = s.name;
+  if (!s.mask_deg) { msg3d('No 3-D terrain for this site: the LOLA polar elevation model covers only the area south of 75°S.'); return; }
+  if (failed3d || !want3d) return;
+  if (!view3d) { start3d(); return; }
+  if (site3d !== s.id) { loadPatch(s); return; }
+  msg3d('');
+  const S = series(s), i = Lidx(st.day) + st.t;
+  view3d.setSky(S.sAz[i], S.sEl[i], S.eAz[i], S.eEl[i], S.sClr[i] > -SUN_R, S.eClr[i] > -S.eR[i]);
+}
+function start3d() {
+  if (starting3d) return;
+  starting3d = true; msg3d('Loading the 3-D view…');
+  import('./terrain3d.js').then((m) => { view3d = m.createTerrainView($('t3dCv')); render3d(); })
+    .catch(() => { failed3d = true; msg3d('The 3-D view could not start. It needs WebGL and the three.js library from cdn.jsdelivr.net.'); });
+}
+function loadPatch(s) {
+  if (loading3d === s.id) return;
+  loading3d = s.id; msg3d('Loading terrain…');
+  if (!patchCache.has(s.id)) patchCache.set(s.id, getJSON('data/terrain/' + s.id + '.json'));
+  patchCache.get(s.id).then((P) => {
+    loading3d = null;
+    if (curSite().id !== s.id) { render3d(); return; }
+    view3d.setTerrain(P, series(s).earthCentre); site3d = s.id; render3d();
+  }).catch(() => { loading3d = null; patchCache.delete(s.id); msg3d('Could not load data/terrain/' + s.id + '.json.'); });
 }
 
 function renderAll() {
@@ -519,6 +552,7 @@ function bind() {
   });
 
   new ResizeObserver(() => { drawCalendar(); drawOverview(); renderNow(); }).observe($('calCv').parentElement);
+  new IntersectionObserver((es) => { if (!want3d && es.some((e) => e.isIntersecting)) { want3d = true; render3d(); } }, { rootMargin: '300px' }).observe($('t3dCv'));
 }
 
 // ---------- start ----------

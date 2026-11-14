@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<!-- three.js (MIT) for the 3-D terrain view; loaded from jsDelivr only when that view starts. -->
+<script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="app.js"></script>
 </head>
 <body>
@@ -123,6 +125,18 @@
       </div>
     </section>
   </div>
+
+  <section class="card dark t3d" aria-label="Terrain in 3D">
+    <div class="sec-head">
+      <h2>Terrain around <span id="t3dTitle">—</span> in 3D</h2>
+      <span class="hint">Drag to turn · scroll or pinch to zoom · right-drag to move</span>
+    </div>
+    <div class="t3d-wrap">
+      <canvas id="t3dCv" class="t3d-cv" aria-label="3-D view of the terrain around the site"></canvas>
+      <p class="t3d-msg" id="t3dMsg">The 3-D view starts when you scroll here.</p>
+    </div>
+    <p class="note">38 × 38 km of LOLA 240 m terrain around the site (white pin), at true vertical scale with the Moon's curvature. Light and shadows follow the Sun's direction at the time on the slider. Only terrain inside this square casts shadows here, so trust the Sun and Earth figures above, which use the whole horizon. Yellow arrow: Sun. Blue arrow: Earth, lit by the Sun so it shows its phase. Arrows and balls are not to scale; a faint arrow is below the horizon.</p>
+  </section>
 
   <section class="card cal" aria-label="Delay calendar">
     <div class="sec-head">
