@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lunar Horizon — landing site and date planner</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#070A10}
+a{color:#7CC0FF}a:hover{color:#B3DAFF}
+input[type=range]{accent-color:#FFC24B}
+</style>
+</helmet>
+<div style="box-sizing: border-box; min-height: 100vh; background: #070A10; color: #E8ECF2; font-family: Inter, system-ui, sans-serif; padding: 24px 20px 48px">
+<div style="max-width: 1360px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
+
+  <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+    <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 520px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.5px">Lunar Horizon</h1>
+      <p style="margin: 0; font-size: 16px; color: #C3CCD8">Pick a landing site and a landing time. See when you will have sunlight for power and Earth in view for a direct link — and which day to choose if the launch slips.</p>
+    </div>
+    <div style="flex: 1 1 380px; max-width: 520px; border: 1px solid #5A4A22; background: #1C1709; border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.45; color: #F3E3B5">
+      <b>Smooth-Moon preview.</b> Sun and Earth positions are real (JPL DE421 ephemeris, Nov 2026 – Dec 2030). Terrain is <b>not yet included</b>: real horizons from NASA LOLA elevation data come next, and they will change every number.
+    </div>
+  </header>
+
+  <section aria-label="Scenario" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 14px 16px">
+    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 210px">
+      <span style="font-size: 12px; color: #A7B2C2">Site</span>
+      <span style="font-size: 17px; font-weight: 600">{{siteName}}</span>
+      <span style="font-size: 12px; color: #A7B2C2">{{siteCoords}}</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: #A7B2C2">Landing date (UTC)</span>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button type="button" aria-label="One day earlier" onClick="{{dayPrev}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 18px Inter, sans-serif">‹</button>
+        <span style="font-size: 16px; font-weight: 600; min-width: 108px; text-align: center">{{landingDate}}</span>
+        <button type="button" aria-label="One day later" onClick="{{dayNext}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 18px Inter, sans-serif">›</button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="hourSel" style="font-size: 12px; color: #A7B2C2">Touchdown time</label>
+      <select id="hourSel" value="{{hourIdx}}" onChange="{{onHour}}" style="height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 15px Inter, sans-serif">
+        <sc-for list="{{hourOpts}}" as="o" hint-placeholder-count="8"><option value="{{o.v}}">{{o.label}}</option></sc-for>
+      </select>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: #A7B2C2">Surface mission</span>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button type="button" aria-label="Shorter mission" onClick="{{durDec}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 18px Inter, sans-serif">−</button>
+        <span style="font-size: 16px; font-weight: 600; min-width: 66px; text-align: center">{{durLabel}}</span>
+        <button type="button" aria-label="Longer mission" onClick="{{durInc}}" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 18px Inter, sans-serif">+</button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: #A7B2C2">Earth counts as usable above</span>
+      <div style="display: flex; gap: 6px">
+        <sc-for list="{{thrOpts}}" as="o" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid {{o.border}}; background: {{o.bg}}; color: {{o.fg}}; font: 600 14px Inter, sans-serif">{{o.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{failed}}" hint-placeholder-val="{{ false }}">
+    <p role="alert" style="margin: 0; padding: 12px 16px; border-radius: 12px; background: #2A1414; color: #FFC9C0; font-size: 14px">Could not load the ephemeris file. Reload the page to try again.</p>
+  </sc-if>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: stretch">
+    <section aria-label="Horizon view" style="flex: 999 1 640px; min-width: 0; background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: center">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 600">Sky at {{siteName}}</h2>
+        <button type="button" aria-pressed="{{trueScale}}" onClick="{{toggleScale}}" style="height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 13px Inter, sans-serif">{{scaleBtn}}</button>
+      </div>
+      <div style="position: relative">
+        <svg viewBox="0 0 1000 250" role="img" aria-label="{{panoAria}}" style="width: 100%; height: auto; display: block; background: #0A0E16; border-radius: 10px">
+          <sc-for list="{{gridLines}}" as="g" hint-placeholder-count="4">
+            <line x1="44" x2="1000" y1="{{g.y}}" y2="{{g.y}}" stroke="#1C2432"></line>
+            <text x="6" y="{{g.ty}}" fill="#A7B2C2" font-size="13" font-family="Inter">{{g.label}}</text>
+          </sc-for>
+          <sc-for list="{{sunSegs}}" as="p" hint-placeholder-count="2">
+            <polyline points="{{p.pts}}" fill="none" stroke="#FFC24B" stroke-opacity="0.6" stroke-width="2" stroke-dasharray="3 4"></polyline>
+          </sc-for>
+          <sc-for list="{{earthSegs}}" as="p" hint-placeholder-count="1">
+            <polyline points="{{p.pts}}" fill="none" stroke="#6CB6FF" stroke-opacity="0.7" stroke-width="2" stroke-dasharray="3 4"></polyline>
+          </sc-for>
+          <sc-if value="{{earthShown}}" hint-placeholder-val="{{ true }}">
+            <ellipse cx="{{earthX}}" cy="{{earthY}}" rx="{{earthRx}}" ry="{{earthRy}}" fill="#6CB6FF" stroke="#D4EAFF" stroke-width="1.5"></ellipse>
+          </sc-if>
+          <sc-if value="{{sunShown}}" hint-placeholder-val="{{ true }}">
+            <ellipse cx="{{sunX}}" cy="{{sunY}}" rx="{{sunRx}}" ry="{{sunRy}}" fill="#FFC24B" stroke="#FFE7B0" stroke-width="1.5"></ellipse>
+          </sc-if>
+          <rect x="44" y="{{groundY}}" width="956" height="{{groundH}}" fill="#262E3C"></rect>
+          <line x1="44" x2="1000" y1="{{groundY}}" y2="{{groundY}}" stroke="#7A879C" stroke-width="1.5"></line>
+          <sc-if value="{{earthGhost}}" hint-placeholder-val="{{ false }}">
+            <ellipse cx="{{earthX}}" cy="{{earthY}}" rx="{{earthRx}}" ry="{{earthRy}}" fill="none" stroke="#6CB6FF" stroke-width="1.5" stroke-dasharray="3 3"></ellipse>
+          </sc-if>
+          <sc-if value="{{sunGhost}}" hint-placeholder-val="{{ false }}">
+            <ellipse cx="{{sunX}}" cy="{{sunY}}" rx="{{sunRx}}" ry="{{sunRy}}" fill="none" stroke="#FFC24B" stroke-width="1.5" stroke-dasharray="3 3"></ellipse>
+          </sc-if>
+          <sc-for list="{{compass}}" as="k" hint-placeholder-count="5">
+            <text x="{{k.x}}" y="244" fill="{{k.fill}}" font-size="13" font-weight="600" font-family="Inter" text-anchor="middle">{{k.label}}</text>
+          </sc-for>
+        </svg>
+        <span style="position: absolute; right: 10px; top: 8px; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #F3E3B5; background: rgba(28,23,9,0.85); padding: 3px 8px; border-radius: 6px">SMOOTH MOON · NO TERRAIN YET</span>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #A7B2C2">{{panoNote}}</p>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <button type="button" aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="width: 44px; height: 44px; flex: none; border-radius: 22px; border: none; background: #FFC24B; color: #070A10; font: 700 15px Inter, sans-serif">{{playIcon}}</button>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+          <label for="tSlider" style="font-size: 14px; font-weight: 600">{{nowLabel}}</label>
+          <input id="tSlider" type="range" min="0" max="{{tMax}}" step="1" value="{{t}}" onInput="{{onT}}" onChange="{{onT}}" style="width: 100%; height: 28px; margin: 0">
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span style="width: 56px; font-size: 12px; color: #FFC24B; font-weight: 600">Sun</span>
+          <div style="flex: 1; display: flex; height: 14px; border: 1px solid #3A4558; border-radius: 3px; overflow: hidden">
+            <sc-for list="{{laneSun}}" as="c" hint-placeholder-count="112"><span style="flex: 1 1 0; background: {{c.bg}}; box-shadow: {{c.cur}}"></span></sc-for>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span style="width: 56px; font-size: 12px; color: #7CC0FF; font-weight: 600">Earth</span>
+          <div style="flex: 1; display: flex; height: 14px; border: 1px solid #3A4558; border-radius: 3px; overflow: hidden">
+            <sc-for list="{{laneEarth}}" as="c" hint-placeholder-count="112"><span style="flex: 1 1 0; background: {{c.bg}}; box-shadow: {{c.cur}}"></span></sc-for>
+          </div>
+        </div>
+        <span style="font-size: 12px; color: #A7B2C2">Mission from touchdown to the end. Filled = up, empty = not up. White mark = the time on the slider.</span>
+      </div>
+    </section>
+
+    <section aria-label="Readouts" style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 12px">
+      <div style="background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 600; color: #FFC24B; letter-spacing: 0.5px">SUN · POWER</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 36px; font-weight: 700">{{sunEl}}</span>
+        <span style="font-size: 13px; color: #C3CCD8">above the horizon · azimuth {{sunAz}} (for panel pointing)</span>
+        <span style="font-size: 13px; color: #C3CCD8">{{sunDisc}} of the solar disc above the horizon</span>
+        <span style="font-size: 15px; font-weight: 600; margin-top: 4px">{{sunState}}</span>
+      </div>
+      <div style="background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 12px; font-weight: 600; color: #7CC0FF; letter-spacing: 0.5px">EARTH · LINE OF SIGHT</span>
+        <span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 36px; font-weight: 700">{{earthEl}}</span>
+        <span style="font-size: 13px; color: #C3CCD8">above the horizon · azimuth {{earthAz}}</span>
+        <span style="font-size: 15px; font-weight: 600; margin-top: 4px">{{earthState}}</span>
+        <span style="font-size: 12px; color: #A7B2C2">Line of sight only. Ground-station schedules and relay satellites are not modelled.</span>
+      </div>
+      <div style="background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.5px">THIS MISSION</span>
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span style="color: #C3CCD8">At touchdown</span><b>{{mTouch}}</b></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span style="color: #C3CCD8">Sun + Earth from touchdown</span><b>{{mRun}}</b></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span style="color: #C3CCD8">Sun + Earth in total</span><b>{{mBoth}}</b></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span style="color: #C3CCD8">Longest darkness</span><b>{{mDark}}</b></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 14px"><span style="color: #C3CCD8">Longest time without Earth</span><b>{{mNoEarth}}</b></div>
+      </div>
+    </section>
+  </div>
+
+  <section aria-label="Delay calendar" style="background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: center">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 600">If the launch slips: which site, which day?</h2>
+        <span style="font-size: 13px; color: #C3CCD8">Touchdown at {{hourLabel}} UTC, {{durLabel}} mission. Brighter = longer unbroken Sun + Earth from touchdown. Point at a cell to read it; click to choose it.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <button type="button" aria-label="Previous 30 days" onClick="{{wsPrev}}" style="width: 44px; height: 40px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 16px Inter, sans-serif">‹</button>
+        <span style="font-size: 14px; font-weight: 600; min-width: 190px; text-align: center">{{windowLabel}}</span>
+        <button type="button" aria-label="Next 30 days" onClick="{{wsNext}}" style="width: 44px; height: 40px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 600 16px Inter, sans-serif">›</button>
+      </div>
+    </div>
+
+    <div aria-live="polite" style="min-height: 44px; display: flex; align-items: center; padding: 8px 12px; border-radius: 10px; background: #151B26; font-size: 14px; line-height: 1.4">{{readout}}</div>
+
+    <div style="overflow-x: auto">
+      <div tabindex="0" role="application" aria-label="Delay calendar. Arrow keys move between days and sites." onKeyDown="{{onGridKey}}" onMouseLeave="{{clearHover}}" style="min-width: 920px; display: flex; flex-direction: column; gap: 4px; outline-offset: 4px">
+        <div style="display: flex; gap: 10px; align-items: flex-end">
+          <span style="width: 220px; flex: none"></span>
+          <div style="flex: 1; display: flex; font-size: 12px; color: #A7B2C2">
+            <sc-for list="{{dayTicks}}" as="m" hint-placeholder-count="13">
+              <span style="flex: {{m.n}} 1 0; min-width: 0; border-left: 1px solid #3A4558; padding-left: 3px; white-space: nowrap; overflow: hidden">{{m.label}}</span>
+            </sc-for>
+          </div>
+        </div>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+          <div style="display: flex; gap: 10px; align-items: center">
+            <button type="button" tabindex="-1" onClick="{{r.pick}}" style="width: 220px; flex: none; text-align: left; padding: 4px 8px; border-radius: 8px; border: 1px solid {{r.border}}; background: {{r.bg}}; color: #E8ECF2; display: flex; flex-direction: column; gap: 1px; cursor: pointer">
+              <span style="font: 600 13px Inter, sans-serif">{{r.name}}</span>
+              <span style="font: 400 11px Inter, sans-serif; color: #A7B2C2">{{r.tag}}</span>
+            </button>
+            <div style="flex: 1; display: flex; gap: 1px; height: 32px">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="90">
+                <button type="button" tabindex="-1" aria-label="{{c.aria}}" onClick="{{c.pick}}" onMouseEnter="{{c.hover}}" style="flex: 1 1 0; min-width: 0; padding: 0; border: none; border-radius: 2px; background: {{c.bg}}; box-shadow: {{c.ring}}; cursor: pointer"></button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 12px; color: #C3CCD8">
+      <div style="display: flex; align-items: center; gap: 4px">
+        <span>Unbroken Sun + Earth from touchdown:</span>
+        <span>short</span>
+        <span style="width: 18px; height: 14px; border-radius: 2px; background: #1F3A5A"></span>
+        <span style="width: 18px; height: 14px; border-radius: 2px; background: #245E86"></span>
+        <span style="width: 18px; height: 14px; border-radius: 2px; background: #2E86A6"></span>
+        <span style="width: 18px; height: 14px; border-radius: 2px; background: #6BC3B8"></span>
+        <span style="width: 18px; height: 14px; border-radius: 2px; background: #F2E7A1"></span>
+        <span>whole mission</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 14px; border-radius: 2px; background: #151A23; box-shadow: inset 0 0 0 1px #3A4558"></span><span>Sun or Earth down at touchdown</span></div>
+      <div style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 14px; border-radius: 2px; background: #2E86A6; box-shadow: inset 0 0 0 2px #FFFFFF, 0 0 0 1px #070A10"></span><span>Your choice</span></div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: #A7B2C2">Whole period for {{siteName}}, week by week (best touchdown in each week). Click to jump.</span>
+      <div style="display: flex; gap: 1px; height: 18px">
+        <sc-for list="{{overview}}" as="w" hint-placeholder-count="215">
+          <button type="button" tabindex="-1" aria-label="{{w.aria}}" onClick="{{w.pick}}" style="flex: 1 1 0; min-width: 0; padding: 0; border: none; background: {{w.bg}}; box-shadow: {{w.ring}}; cursor: pointer"></button>
+        </sc-for>
+      </div>
+      <div style="display: flex; font-size: 11px; color: #A7B2C2">
+        <sc-for list="{{yearTicks}}" as="y" hint-placeholder-count="5"><span style="flex: {{y.n}} 1 0; border-left: 1px solid #3A4558; padding-left: 3px">{{y.label}}</span></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Data and verification" style="background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 16px; display: flex; flex-wrap: wrap; gap: 18px">
+    <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 6px">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 18px; font-weight: 600">Check against JPL Horizons</h2>
+      <span style="font-size: 13px; color: #C3CCD8">84.8°S 29.2°E, 21 Dec 2026 00:00 UTC, observer on the surface.</span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; font-size: 13px">
+        <b style="color: #A7B2C2; font-weight: 600"></b><b style="color: #A7B2C2; font-weight: 600">Horizons</b><b style="color: #A7B2C2; font-weight: 600">This page</b><b style="color: #A7B2C2; font-weight: 600">Difference</b>
+        <span>Sun azimuth</span><span>7.448°</span><span>{{v.sAz}}</span><span>{{v.dsAz}}</span>
+        <span>Sun elevation</span><span>6.419°</span><span>{{v.sEl}}</span><span>{{v.dsEl}}</span>
+        <span>Earth azimuth</span><span>324.155°</span><span>{{v.eAz}}</span><span>{{v.deAz}}</span>
+        <span>Earth elevation</span><span>10.555°</span><span>{{v.eEl}}</span><span>{{v.deEl}}</span>
+      </div>
+      <span style="font-size: 12px; color: #A7B2C2">Horizons values come from a query made before the event; the team re-runs this check, and more dates, in the build.</span>
+    </div>
+    <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.5; color: #C3CCD8">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 18px; font-weight: 600; color: #E8ECF2">Sources and tools</h2>
+      <span><a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a> — reference for Sun and Earth positions. <a href="https://quickmap.lroc.asu.edu/">LROC Quickmap</a> — maps and average illumination for any site. <a href="https://trek.nasa.gov/moon/">NASA Moon Trek</a> — 3D terrain. <a href="https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/">CSA Moon exploration</a> — Canada's lunar missions.</span>
+      <span>What this page adds: a site × landing-date calendar that answers “the launch slipped — where and when now?” in one view.</span>
+      <span>Sites: IM-1, IM-2, Chandrayaan-3, Apollo 11 from LROC landing-site images. Artemis regions are 15 × 15 km; NASA has not published centre points, so each point here is one we picked inside the region.</span>
+      <span><b style="color: #E8ECF2">Use of AI:</b> this page, its calculation code and the ephemeris script were written with Claude (Anthropic) during the hackathon. Site coordinates were researched with AI help and checked against LROC. Design choices were reviewed with AI critiques.</span>
+    </div>
+  </section>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 18px">
+    <section aria-label="Add your own point" style="flex: 1 1 380px; background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 18px; font-weight: 600">Add your own point</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end">
+        <div style="display: flex; flex-direction: column; gap: 4px"><label for="cName" style="font-size: 12px; color: #A7B2C2">Name</label><input id="cName" type="text" value="{{cName}}" onChange="{{onCName}}" style="width: 150px; height: 44px; box-sizing: border-box; padding: 0 10px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 14px Inter, sans-serif"></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><label for="cLat" style="font-size: 12px; color: #A7B2C2">Latitude ° (south −)</label><input id="cLat" type="text" inputmode="decimal" value="{{cLat}}" onChange="{{onCLat}}" style="width: 130px; height: 44px; box-sizing: border-box; padding: 0 10px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 14px Inter, sans-serif"></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><label for="cLon" style="font-size: 12px; color: #A7B2C2">Longitude ° (east +)</label><input id="cLon" type="text" inputmode="decimal" value="{{cLon}}" onChange="{{onCLon}}" style="width: 130px; height: 44px; box-sizing: border-box; padding: 0 10px; border-radius: 10px; border: 1px solid #2A3444; background: #151B26; color: #E8ECF2; font: 14px Inter, sans-serif"></div>
+        <button type="button" onClick="{{addCustom}}" style="height: 44px; padding: 0 16px; border-radius: 10px; border: none; background: #E8ECF2; color: #070A10; font: 600 14px Inter, sans-serif">Add</button>
+      </div>
+      <span style="font-size: 12px; color: {{cMsgColor}}">{{cMsg}}</span>
+    </section>
+    <section aria-label="Why it matters" style="flex: 2 1 560px; background: #0F141D; border: 1px solid #1E2633; border-radius: 16px; padding: 16px; display: flex; flex-wrap: wrap; gap: 16px">
+      <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px"><b style="font-size: 14px">Why is the Sun so low?</b><span style="font-size: 13px; line-height: 1.5; color: #C3CCD8">The Moon's axis is tilted only 1.5°. At 84°S the Sun never rises more than about 8°, and closer to the pole even less. Press “True scale” to see how flat that is.</span></div>
+      <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px"><b style="font-size: 14px">Why does Earth move?</b><span style="font-size: 13px; line-height: 1.5; color: #C3CCD8">Earth stays in almost the same part of the sky, but the Moon's wobble (libration) swings it about 7° up, down and sideways every month. Near the pole that is enough to drop it below the horizon.</span></div>
+      <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 4px"><b style="font-size: 14px">What is not modelled yet</b><span style="font-size: 13px; line-height: 1.5; color: #C3CCD8">Terrain (next step: horizons from NASA LOLA data), ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
+    </section>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+// Written with assistance from Claude (Anthropic), 14 Nov 2026, NASA Space Apps.
+var EPH_URL = '/_blob/94f235b47b682feb38cc6c34e5a08416';
+var R_MOON = 1737.4, AU = 1.496e8, SUN_R = 0.2666, EARTH_R_KM = 6371, D2R = Math.PI / 180, H_OBS_KM = 0.002;
+var WIN = 90;
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var SITES0 = [
+  { id: 'im2', name: 'IM-2 Athena', tag: 'Landed 2025 · NASA CLPS', lat: -84.7906, lon: 29.1957 },
+  { id: 'im1', name: 'IM-1 Odysseus', tag: 'Landed 2024 · NASA CLPS', lat: -80.13, lon: 1.44 },
+  { id: 'malapert', name: 'Malapert Massif', tag: 'Artemis region · our point', lat: -86.0, lon: 0.3 },
+  { id: 'haworth', name: 'Haworth', tag: 'Artemis region · our point', lat: -86.75, lon: -23.67 },
+  { id: 'nobile2', name: 'Nobile Rim 2', tag: 'Artemis region · our point', lat: -83.9, lon: 58.7 },
+  { id: 'degerlache', name: 'de Gerlache Rim 2', tag: 'Artemis region · our point', lat: -88.5, lon: -66.7 },
+  { id: 'bussey', name: 'Most-illuminated point', tag: 'Bussey et al. 2010 · ~86% with terrain', lat: -88.74, lon: 124.5 },
+  { id: 'ch3', name: 'Chandrayaan-3', tag: 'Landed 2023 · ISRO', lat: -69.3741, lon: 32.32 },
+  { id: 'a11', name: 'Apollo 11', tag: 'Landed 1969 · NASA', lat: 0.67416, lon: 23.47314 }
+];
+var RAMP = ['#1F3A5A', '#245E86', '#2E86A6', '#6BC3B8', '#F2E7A1'];
+var NOLAND = '#151A23', BEYOND = '#0B0E14';
+
+function frame(lat, lon) {
+  var la = lat * D2R, lo = lon * D2R;
+  var up = [Math.cos(la) * Math.cos(lo), Math.cos(la) * Math.sin(lo), Math.sin(la)], east = [-Math.sin(lo), Math.cos(lo), 0];
+  if (Math.abs(lat) > 89.9999) east = [0, 1, 0];
+  var north = [up[1] * east[2] - up[2] * east[1], up[2] * east[0] - up[0] * east[2], up[0] * east[1] - up[1] * east[0]];
+  return { up: up, east: east, north: north };
+}
+function vec(lat, lon, d) { var la = lat * D2R, lo = lon * D2R; return [d * Math.cos(la) * Math.cos(lo), d * Math.cos(la) * Math.sin(lo), d * Math.sin(la)]; }
+function azel(F, P, T) {
+  var v = [T[0] - P[0], T[1] - P[1], T[2] - P[2]], n = Math.hypot(v[0], v[1], v[2]);
+  v = [v[0] / n, v[1] / n, v[2] / n];
+  var u = v[0] * F.up[0] + v[1] * F.up[1] + v[2] * F.up[2], e = v[0] * F.east[0] + v[1] * F.east[1] + v[2] * F.east[2], no = v[0] * F.north[0] + v[1] * F.north[1] + v[2] * F.north[2];
+  return [((Math.atan2(e, no) / D2R) + 360) % 360, Math.asin(Math.max(-1, Math.min(1, u))) / D2R, n];
+}
+// Share of a disc of angular radius r above a straight horizon at clearance c (degrees).
+function discFrac(c, r) { if (c >= r) return 1; if (c <= -r) return 0; var x = -c / r; return (Math.acos(x) - x * Math.sqrt(1 - x * x)) / Math.PI; }
+// Smooth Moon: the horizon is the sphere's edge, slightly below 0° for an observer 2 m up.
+var DIP = -Math.acos(R_MOON / (R_MOON + H_OBS_KM)) / D2R;
+function computeSite(E, site) {
+  var N = E.sLat.length, F = frame(site.lat, site.lon), P = vec(site.lat, site.lon, R_MOON + H_OBS_KM);
+  var S = { sAz: new Float32Array(N), sEl: new Float32Array(N), sClr: new Float32Array(N), eAz: new Float32Array(N), eEl: new Float32Array(N), eClr: new Float32Array(N), eR: new Float32Array(N), earthCentre: 0 };
+  var cx = 0, cy = 0;
+  for (var i = 0; i < N; i++) {
+    var s = azel(F, P, vec(E.sLat[i], E.sLon[i], AU)), e = azel(F, P, vec(E.eLat[i], E.eLon[i], E.eKm[i]));
+    S.sAz[i] = s[0]; S.sEl[i] = s[1]; S.sClr[i] = s[1] - DIP;
+    S.eAz[i] = e[0]; S.eEl[i] = e[1]; S.eClr[i] = e[1] - DIP; S.eR[i] = Math.asin(EARTH_R_KM / e[2]) / D2R;
+    cx += Math.cos(e[0] * D2R); cy += Math.sin(e[0] * D2R);
+  }
+  S.earthCentre = ((Math.atan2(cy, cx) / D2R) + 360) % 360;
+  return S;
+}
+// Sun up = centre above the horizon (half the disc). Earth usable = centre at least thr degrees above.
+function scoreTable(S, thr) {
+  var N = S.sAz.length, both = new Uint8Array(N), run = new Int32Array(N + 1), pre = new Int32Array(N + 1);
+  for (var i = 0; i < N; i++) { both[i] = (S.sClr[i] >= 0 && S.eClr[i] >= thr) ? 1 : 0; pre[i + 1] = pre[i] + both[i]; }
+  for (var j = N - 1; j >= 0; j--) run[j] = both[j] ? run[j + 1] + 1 : 0;
+  return { both: both, run: run, pre: pre };
+}
+function longestRun(fn, a, b) { var best = 0, cur = 0; for (var i = a; i < b; i++) { if (fn(i)) { cur++; if (cur > best) best = cur; } else cur = 0; } return best; }
+function wrapRel(az, centre) { return ((az - centre + 540) % 360) - 180; }
+
+class Component extends DCLogic {
+  componentDidMount() {
+    var self = this;
+    fetch(EPH_URL).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (E) {
+      self.E = E; self.STEP_H = E.stepH; self.SPD = Math.round(24 / E.stepH); self.START = Date.parse(E.start);
+      self.setState({ ready: true });
+    }).catch(function () { self.setState({ failed: true }); });
+  }
+  componentWillUnmount() { if (this.timer) clearInterval(this.timer); }
+  series(site) { this._s = this._s || {}; var k = site.lat.toFixed(4) + ',' + site.lon.toFixed(4); if (!this._s[k]) this._s[k] = computeSite(this.E, site); return this._s[k]; }
+  table(site, thr) { this._t = this._t || {}; var k = site.lat.toFixed(4) + ',' + site.lon.toFixed(4) + '|' + thr; if (!this._t[k]) this._t[k] = scoreTable(this.series(site), thr); return this._t[k]; }
+  d(i) { return new Date(this.START + i * this.STEP_H * 3600000); }
+  dLabel(i) { var x = this.d(i); return x.getUTCDate() + ' ' + MON[x.getUTCMonth()] + ' ' + x.getUTCFullYear(); }
+  dtLabel(i) { var x = this.d(i); return this.dLabel(i) + ', ' + String(x.getUTCHours()).padStart(2, '0') + ':00 UTC'; }
+  fmtH(h) { h = Math.max(0, Math.round(h)); var dd = Math.floor(h / 24), r = h % 24; return dd > 0 ? dd + ' d ' + r + ' h' : r + ' h'; }
+  // Hours until a clearance series crosses level `lvl`, interpolated between samples.
+  crossing(arr, lvl, i, N) {
+    var up = arr[i] >= lvl;
+    for (var j = i + 1; j < N; j++) {
+      if ((arr[j] >= lvl) !== up) { var a = arr[j - 1] - lvl, b = arr[j] - lvl, f = a === b ? 0 : a / (a - b); return (j - 1 + f - i) * this.STEP_H; }
+    }
+    return null;
+  }
+  renderVals() {
+    var self = this, st = this.state;
+    var sites = SITES0.concat(st.custom || []);
+    var site = sites.filter(function (s) { return s.id === (st.siteId || 'im2'); })[0] || sites[0];
+    var dur = st.dur || 14, thr = st.thr == null ? 2 : st.thr, hourIdx = st.hourIdx || 0, trueScale = !!st.trueScale, t = st.t || 0;
+    var opt = function (vals, cur, unit, key) { return vals.map(function (v) { var on = v === cur; return { label: v + unit, on: on ? 'true' : 'false', border: on ? '#E8ECF2' : '#2A3444', bg: on ? '#E8ECF2' : '#151B26', fg: on ? '#070A10' : '#E8ECF2', pick: function () { var o = {}; o[key] = v; self.setState(o); } }; }); };
+    var hourOpts = []; for (var hh = 0; hh < 8; hh++) hourOpts.push({ v: String(hh), label: String(hh * 3).padStart(2, '0') + ':00 UTC' });
+    var base = {
+      failed: !!st.failed, siteName: site.name,
+      siteCoords: Math.abs(site.lat).toFixed(2) + '°' + (site.lat < 0 ? 'S' : 'N') + ' · ' + Math.abs(site.lon).toFixed(2) + '°' + (site.lon >= 0 ? 'E' : 'W') + ' · ' + site.tag,
+      durLabel: dur + '-day', hourIdx: String(hourIdx), hourOpts: hourOpts, hourLabel: String(hourIdx * 3).padStart(2, '0') + ':00',
+      onHour: function (e) { self.setState({ hourIdx: Number(e.target.value), t: 0 }); },
+      durDec: function () { self.setState({ dur: Math.max(1, dur - 1), t: 0 }); },
+      durInc: function () { self.setState({ dur: Math.min(30, dur + 1), t: 0 }); },
+      thrOpts: opt([0, 2, 5], thr, '°', 'thr'),
+      trueScale: trueScale ? 'true' : 'false', scaleBtn: trueScale ? 'Stretch height' : 'True scale',
+      toggleScale: function () { self.setState({ trueScale: !trueScale }); },
+      cName: st.cName || '', cLat: st.cLat || '', cLon: st.cLon || '',
+      onCName: function (e) { self.setState({ cName: e.target.value }); },
+      onCLat: function (e) { self.setState({ cLat: e.target.value }); },
+      onCLon: function (e) { self.setState({ cLon: e.target.value }); },
+      cMsg: st.cMsg || 'Any point on the Moon, for example an Apollo site. It joins the calendar and the sky view.',
+      cMsgColor: st.cErr ? '#FFB4A8' : '#A7B2C2',
+      addCustom: function () {
+        var la = parseFloat(String(self.state.cLat || '').replace(',', '.')), lo = parseFloat(String(self.state.cLon || '').replace(',', '.'));
+        if (!(la >= -90 && la <= 90) || !(lo >= -180 && lo <= 360)) { self.setState({ cMsg: 'Enter latitude −90…90 (south negative) and longitude −180…360 (east positive).', cErr: true }); return; }
+        if (lo > 180) lo -= 360;
+        var list = (self.state.custom || []).slice(), id = 'c' + list.length + '_' + la.toFixed(4) + '_' + lo.toFixed(4);
+        list.push({ id: id, name: (self.state.cName || 'My point').slice(0, 24), tag: 'Your point', lat: la, lon: lo });
+        self.setState({ custom: list, siteId: id, cMsg: 'Added to the calendar and the sky view.', cErr: false, cName: '', cLat: '', cLon: '', t: 0 });
+      },
+      playIcon: st.playing ? '❚❚' : '▶', playLabel: st.playing ? 'Pause' : 'Play the mission',
+      togglePlay: function () {
+        if (self.timer) { clearInterval(self.timer); self.timer = null; self.setState({ playing: false }); return; }
+        self.timer = setInterval(function () { self.setState(function (s) { var n = (s.dur || 14) * self.SPD; return { t: ((s.t || 0) + 1) % n }; }); }, 140);
+        self.setState({ playing: true });
+      },
+      onT: function (e) { self.setState({ t: Number(e.target.value) }); }
+    };
+    var empty = { landingDate: '—', dayPrev: null, dayNext: null, wsPrev: null, wsNext: null, windowLabel: 'Loading…', readout: st.failed ? 'No data.' : 'Loading ephemeris…', onGridKey: null, clearHover: null, dayTicks: [], rows: [], overview: [], yearTicks: [], gridLines: [], sunSegs: [], earthSegs: [], compass: [], laneSun: [], laneEarth: [], earthShown: false, sunShown: false, earthGhost: false, sunGhost: false, groundY: 200, groundH: 50, sunX: -50, sunY: -50, sunRx: 0, sunRy: 0, earthX: -50, earthY: -50, earthRx: 0, earthRy: 0, panoAria: 'Loading', panoNote: '', nowLabel: '', tMax: 1, t: 0, sunEl: '—', sunAz: '—', sunDisc: '—', sunState: '', earthEl: '—', earthAz: '—', earthState: '', mTouch: '—', mRun: '—', mBoth: '—', mDark: '—', mNoEarth: '—', v: { sAz: '—', sEl: '—', eAz: '—', eEl: '—', dsAz: '', dsEl: '', deAz: '', deEl: '' } };
+    if (!st.ready) return Object.assign(base, empty);
+
+    var E = this.E, N = E.sLat.length, SPD = this.SPD, steps = dur * SPD;
+    var lastDay = Math.floor((N - steps - hourIdx - 1) / SPD);
+    var day = Math.max(0, Math.min(lastDay, st.day == null ? 30 : st.day));
+    var ws = st.ws == null ? Math.max(0, day - 15) : st.ws;
+    ws = Math.max(0, Math.min(ws, lastDay - WIN + 1));
+    if (day < ws || day >= ws + WIN) ws = Math.max(0, Math.min(day - 15, lastDay - WIN + 1));
+    var setDay = function (d2, extra) { var o = Object.assign({ day: Math.max(0, Math.min(lastDay, d2)), t: 0 }, extra || {}); if (o.day < ws || o.day >= ws + WIN) o.ws = Math.max(0, o.day - 15); self.setState(o); };
+    var Lidx = function (d2) { return d2 * SPD + hourIdx; };
+    var cellInfo = function (s, d2) {
+      var T = self.table(s, thr), L = Lidx(d2);
+      if (d2 > lastDay) return { v: -1 };
+      if (!T.both[L]) return { v: -2 };
+      return { v: Math.min(T.run[L], steps) / steps };
+    };
+    var colorOf = function (v) { return v === -1 ? BEYOND : (v === -2 ? NOLAND : RAMP[Math.max(0, Math.min(4, Math.floor(v * 5 - 1e-9)))]); };
+    var describe = function (s, d2) {
+      var S = self.series(s), T = self.table(s, thr), L = Lidx(d2);
+      if (d2 > lastDay) return s.name + ': this landing date runs past the end of the data (Dec 2030).';
+      var sunOk = S.sClr[L] >= 0, eOk = S.eClr[L] >= thr;
+      var runH = Math.min(T.run[L], steps) * self.STEP_H, tot = (T.pre[L + steps] - T.pre[L]) / steps;
+      var dark = longestRun(function (i) { return S.sClr[i] < 0; }, L, L + steps) * self.STEP_H;
+      return s.name + ' · land ' + self.dtLabel(L) + ' — at touchdown: Sun ' + (sunOk ? 'up' : 'DOWN') + ', Earth ' + (eOk ? 'usable' : 'NOT usable') + ' · unbroken Sun + Earth from touchdown: ' + self.fmtH(runH) + ' of ' + dur + ' d · Sun + Earth in total ' + Math.round(tot * 100) + '% · longest darkness ' + self.fmtH(dark) + '.';
+    };
+
+    // Calendar rows (90-day window), cached: they do not change while the mission plays.
+    var hov = st.hover;
+    var ckey = [ws, day, site.id, thr, hourIdx, dur, sites.length].join('|');
+    var cached = this._cal && this._cal.key === ckey ? this._cal : null;
+    var rows = cached ? cached.rows : sites.map(function (s, si) {
+      var sel = s.id === site.id, cells = [];
+      for (var d2 = ws; d2 < ws + WIN; d2++) {
+        (function (dd) {
+          var ci = cellInfo(s, dd), mine = sel && dd === day;
+          cells.push({ bg: colorOf(ci.v), ring: mine ? 'inset 0 0 0 2px #FFFFFF, 0 0 0 1px #070A10' : (ci.v === -2 ? 'inset 0 0 0 1px #2A3343' : 'none'),
+            aria: s.name + ', ' + self.dLabel(dd * SPD),
+            pick: function () { setDay(dd, { siteId: s.id }); },
+            hover: function () { var h0 = self.state.hover; if (!h0 || h0.s !== s.id || h0.d !== dd) self.setState({ hover: { s: s.id, d: dd } }); } });
+        })(d2);
+      }
+      return { name: s.name, tag: s.tag, border: sel ? '#E8ECF2' : '#1E2633', bg: sel ? '#1B2433' : '#0F141D', cells: cells, pick: function () { self.setState({ siteId: s.id, t: 0 }); } };
+    });
+    if (!cached) cached = this._cal = { key: ckey, rows: rows };
+    var dayTicks = [], d3 = ws;
+    while (d3 < ws + WIN) { var x0 = this.d(d3 * SPD), n = 0; while (d3 + n < ws + WIN && this.d((d3 + n) * SPD).getUTCMonth() === x0.getUTCMonth()) n++; dayTicks.push({ n: n, label: n >= 4 ? (x0.getUTCDate() === 1 ? '' : x0.getUTCDate() + ' ') + MON[x0.getUTCMonth()] + ' ' + x0.getUTCFullYear() : '' }); d3 += n; }
+    var hovSite = hov ? sites.filter(function (s) { return s.id === hov.s; })[0] : null;
+    var readout = hovSite ? describe(hovSite, hov.d) : describe(site, day);
+    var siteIdx = sites.indexOf(site);
+    // Week overview for the selected site
+    var overview = [], yearTicks = [], weeks = Math.floor((lastDay + 1) / 7);
+    if (cached.overview) { overview = cached.overview; weeks = 0; }
+    for (var w = 0; w < weeks; w++) {
+      (function (wk) {
+        var best = -2; for (var k = 0; k < 7; k++) { var ci = cellInfo(site, wk * 7 + k); if (ci.v > best) best = ci.v; }
+        overview.push({ bg: colorOf(best), ring: (day >= wk * 7 && day < wk * 7 + 7) ? 'inset 0 0 0 2px #FFFFFF' : 'none', aria: 'Week of ' + self.dLabel(wk * 7 * SPD), pick: function () { setDay(wk * 7, { ws: wk * 7 }); } });
+      })(w);
+    }
+    cached.overview = overview; weeks = overview.length;
+    var yw = 0; while (yw < weeks) { var y0 = this.d(yw * 7 * SPD).getUTCFullYear(), m = 0; while (yw + m < weeks && this.d((yw + m) * 7 * SPD).getUTCFullYear() === y0) m++; yearTicks.push({ n: m, label: m >= 6 ? String(y0) : '' }); yw += m; }
+
+    // Sky view
+    var S = this.series(site), T = this.table(site, thr), L0 = Lidx(day), tt = Math.min(t, steps - 1), iNow = L0 + tt;
+    var polar = site.lat < -60 || site.lat > 60;
+    var centre = polar ? S.earthCentre : (site.lat < 0 ? 180 : 0);
+    var X0 = 44, PW = 956, pxDeg = PW / 360;
+    var lo = -1, hi = 2;
+    for (var q = L0; q < L0 + steps; q++) { if (S.sEl[q] > -2) hi = Math.max(hi, S.sEl[q] + 0.6); if (S.eEl[q] > -2) hi = Math.max(hi, S.eEl[q] + S.eR[q] + 0.4); }
+    var vy, ex;
+    if (trueScale) { vy = pxDeg; ex = 1; lo = -2; } else { vy = Math.min(14 * pxDeg, 205 / (hi - lo)); ex = vy / pxDeg; }
+    var Y = function (el) { return 225 - (el - lo) * vy; };
+    var Xa = function (az) { return X0 + (wrapRel(az, centre) + 180) * pxDeg; };
+    var segs = function (A, B) { var out = [], cur = [], lastX = null; for (var i = L0; i < L0 + steps; i++) { var x = Xa(A[i]), y = Y(B[i]); if (lastX !== null && Math.abs(x - lastX) > PW / 2) { if (cur.length > 1) out.push({ pts: cur.join(' ') }); cur = []; } if (y > -20 && y < 270) cur.push(x.toFixed(1) + ',' + y.toFixed(1)); lastX = x; } if (cur.length > 1) out.push({ pts: cur.join(' ') }); return out; };
+    var stepDeg = trueScale ? (hi > 40 ? 30 : 10) : (hi - lo > 20 ? 10 : (hi - lo > 8 ? 2 : 1));
+    var gridLines = []; for (var gdeg = Math.ceil(lo / stepDeg) * stepDeg; gdeg <= (trueScale ? 80 : hi); gdeg += stepDeg) { var gy = Y(gdeg); if (gy > 8 && gy < 228) gridLines.push({ y: gy.toFixed(1), ty: (gy + 4).toFixed(1), label: gdeg + '°' }); }
+    var poleLbl = site.lat < 0 ? 'S · pole' : 'S';
+    var compass = [{ az: 0, l: site.lat > 0 && polar ? 'N · pole' : 'N' }, { az: 90, l: 'E' }, { az: 180, l: poleLbl }, { az: 270, l: 'W' }].map(function (c) { return { x: Xa(c.az).toFixed(1), label: c.l, fill: '#A7B2C2' }; })
+      .filter(function (c) { return !polar || Math.abs(Number(c.x) - (X0 + PW / 2)) > 60; });
+    if (polar) compass.push({ x: (X0 + PW / 2).toFixed(1), label: '▼ toward Earth', fill: '#7CC0FF' });
+    var groundY = Math.min(240, Y(DIP));
+    var sClr = S.sClr[iNow], eClr = S.eClr[iNow];
+    var sunUp = sClr > -SUN_R, earthUp = eClr > -S.eR[iNow];
+    var rx = function (r) { return Math.max(3, r * pxDeg); }, ry = function (r) { return Math.max(3, r * vy); };
+    var when = function (h) { return h === null ? 'no change before Dec 2030 (end of data)' : 'in ≈ ' + self.fmtH(h); };
+    var sCross = this.crossing(S.sClr, 0, iNow, N), eCross = this.crossing(S.eClr, thr, iNow, N);
+    var sunState = sClr >= 0 ? 'Up — sets ' + when(sCross) : 'Down — rises ' + when(sCross);
+    var earthState = eClr >= thr ? 'Usable — drops below ' + thr + '° ' + when(eCross) : (S.eEl[iNow] > DIP ? 'Too low (under ' + thr + '°) — usable ' + when(eCross) : 'Below the horizon — usable ' + when(eCross));
+    var laneSun = [], laneEarth = [];
+    for (var j = L0; j < L0 + steps; j++) { var cur = j === iNow ? 'inset 0 0 0 2px #FFFFFF' : 'none'; laneSun.push({ bg: S.sClr[j] >= 0 ? '#FFC24B' : 'transparent', cur: cur }); laneEarth.push({ bg: S.eClr[j] >= thr ? '#6CB6FF' : 'transparent', cur: cur }); }
+    var both = T.pre[L0 + steps] - T.pre[L0];
+    // Verification against Horizons reference (h = 0)
+    var vi = Math.round((Date.UTC(2026, 11, 21) - this.START) / (this.STEP_H * 3600000));
+    var Fv = frame(-84.8, 29.2), Pv = vec(-84.8, 29.2, R_MOON), sv = azel(Fv, Pv, vec(E.sLat[vi], E.sLon[vi], AU)), ev = azel(Fv, Pv, vec(E.eLat[vi], E.eLon[vi], E.eKm[vi]));
+    var df = function (a, b) { var x = a - b; return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(3) + '°'; };
+    return Object.assign(base, {
+      landingDate: this.dLabel(L0),
+      dayPrev: function () { setDay(day - 1); }, dayNext: function () { setDay(day + 1); },
+      wsPrev: function () { self.setState({ ws: Math.max(0, ws - 30) }); }, wsNext: function () { self.setState({ ws: Math.min(lastDay - WIN + 1, ws + 30) }); },
+      windowLabel: this.dLabel(ws * SPD) + ' – ' + this.dLabel((ws + WIN - 1) * SPD),
+      readout: readout,
+      clearHover: function () { if (self.state.hover) self.setState({ hover: null }); },
+      onGridKey: function (e) {
+        var k = e.key;
+        if (k === 'ArrowRight') { e.preventDefault(); setDay(day + 1); }
+        else if (k === 'ArrowLeft') { e.preventDefault(); setDay(day - 1); }
+        else if (k === 'ArrowDown') { e.preventDefault(); self.setState({ siteId: sites[Math.min(sites.length - 1, siteIdx + 1)].id, t: 0 }); }
+        else if (k === 'ArrowUp') { e.preventDefault(); self.setState({ siteId: sites[Math.max(0, siteIdx - 1)].id, t: 0 }); }
+      },
+      dayTicks: dayTicks, rows: rows, overview: overview, yearTicks: yearTicks,
+      gridLines: gridLines, compass: compass, sunSegs: segs(S.sAz, S.sEl), earthSegs: segs(S.eAz, S.eEl),
+      groundY: groundY.toFixed(1), groundH: (250 - groundY).toFixed(1),
+      sunX: Xa(S.sAz[iNow]).toFixed(1), sunY: Y(S.sEl[iNow]).toFixed(1), sunRx: rx(SUN_R).toFixed(1), sunRy: ry(SUN_R).toFixed(1),
+      earthX: Xa(S.eAz[iNow]).toFixed(1), earthY: Math.max(4, Y(S.eEl[iNow])).toFixed(1), earthRx: rx(S.eR[iNow]).toFixed(1), earthRy: ry(S.eR[iNow]).toFixed(1),
+      sunShown: sunUp, sunGhost: !sunUp, earthShown: earthUp, earthGhost: !earthUp,
+      panoAria: 'Sky at ' + site.name + ' on ' + this.dtLabel(iNow) + '. Sun ' + S.sEl[iNow].toFixed(1) + ' degrees above the horizon, ' + sunState + '. Earth ' + S.eEl[iNow].toFixed(1) + ' degrees, ' + earthState + '.',
+      panoNote: (polar ? 'Centred on the direction to Earth. ' : 'Centred on ' + (site.lat < 0 ? 'south' : 'north') + '. ') + (trueScale ? 'True scale: 1° up is as tall as 1° across.' : (ex > 1.05 ? 'Height stretched ×' + ex.toFixed(1) + ' so low angles are visible.' : 'Height shown at about true scale.')) + ' Sun and Earth are drawn at their real size. Dashed: their paths during the mission; a dashed outline means below the horizon.',
+      nowLabel: this.dtLabel(iNow) + ' · mission day ' + (Math.floor(tt / SPD) + 1) + ' of ' + dur, tMax: steps - 1, t: tt,
+      sunEl: (S.sEl[iNow] >= 0 ? '' : '−') + Math.abs(S.sEl[iNow]).toFixed(1) + '°', sunAz: Math.round(S.sAz[iNow]) + '°', sunDisc: Math.round(discFrac(sClr, SUN_R) * 100) + '%', sunState: sunState,
+      earthEl: (S.eEl[iNow] >= 0 ? '' : '−') + Math.abs(S.eEl[iNow]).toFixed(1) + '°', earthAz: Math.round(S.eAz[iNow]) + '°', earthState: earthState,
+      laneSun: laneSun, laneEarth: laneEarth,
+      mTouch: (S.sClr[L0] >= 0 ? 'Sun up' : 'Sun DOWN') + ' · ' + (S.eClr[L0] >= thr ? 'Earth usable' : 'Earth NOT usable'),
+      mRun: this.fmtH(Math.min(T.run[L0], steps) * this.STEP_H),
+      mBoth: Math.round(both / steps * 100) + '% (' + this.fmtH(both * this.STEP_H) + ')',
+      mDark: this.fmtH(longestRun(function (i) { return S.sClr[i] < 0; }, L0, L0 + steps) * this.STEP_H),
+      mNoEarth: this.fmtH(longestRun(function (i) { return S.eClr[i] < thr; }, L0, L0 + steps) * this.STEP_H),
+      v: { sAz: sv[0].toFixed(3) + '°', sEl: sv[1].toFixed(3) + '°', eAz: ev[0].toFixed(3) + '°', eEl: ev[1].toFixed(3) + '°', dsAz: df(sv[0], 7.448), dsEl: df(sv[1], 6.419), deAz: df(ev[0], 324.155), deEl: df(ev[1], 10.555) }
+    });
+  }
+}
+</script>
+</body>
+</html>

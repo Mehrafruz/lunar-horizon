@@ -1,0 +1,14 @@
+{
+  "source": "Site list compiled during NASA Space Apps 2026 with AI help (Claude Code, Anthropic); landed-site coordinates checked against LROC landing-site images. Artemis points are our own picks inside each region (NASA has not published region centres).",
+  "sites": [
+    { "id": "im2", "name": "IM-2 Athena", "tag": "Landed 2025 · NASA CLPS", "lat": -84.7906, "lon": 29.1957, "source": "https://lroc.im-ldi.com/images/1408" },
+    { "id": "im1", "name": "IM-1 Odysseus", "tag": "Landed 2024 · NASA CLPS", "lat": -80.13, "lon": 1.44, "source": "https://lroc.im-ldi.com/images/1360" },
+    { "id": "malapert", "name": "Malapert Massif", "tag": "Artemis region · our point", "lat": -86.0, "lon": 0.3, "source": "Our point: LROC NAC ROI mosaic centre" },
+    { "id": "haworth", "name": "Haworth", "tag": "Artemis region · our point", "lat": -86.75, "lon": -23.67, "source": "Our point inside the Artemis region" },
+    { "id": "nobile2", "name": "Nobile Rim 2", "tag": "Artemis region · our point", "lat": -83.9, "lon": 58.7, "source": "Our point inside the Artemis region" },
+    { "id": "degerlache", "name": "de Gerlache Rim 2", "tag": "Artemis region · our point", "lat": -88.5, "lon": -66.7, "source": "Our point inside the Artemis region (low confidence)" },
+    { "id": "bussey", "name": "Most-illuminated point", "tag": "Bussey et al. 2010 · ~86% with terrain", "lat": -88.74, "lon": 124.5, "source": "Bussey et al. 2010, Icarus 208:558" },
+    { "id": "ch3", "name": "Chandrayaan-3", "tag": "Landed 2023 · ISRO", "lat": -69.3741, "lon": 32.32, "source": "https://lroc.im-ldi.com/images/1314" },
+    { "id": "a11", "name": "Apollo 11", "tag": "Landed 1969 · NASA", "lat": 0.67416, "lon": 23.47314, "source": "https://lroc.im-ldi.com/images/938" }
+  ]
+}
