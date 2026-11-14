@@ -489,6 +489,29 @@ function loadPatch(s) {
   }).catch(() => { loading3d = null; patchCache.delete(s.id); msg3d('Could not load data/terrain/' + s.id + '.json.'); });
 }
 
+// ---------- scenario in the address (#site=im2&date=2026-12-16&hour=00&days=14&earth=2&terrain=lola) ----------
+let hashReady = false;
+function readHash() {
+  const q = new URLSearchParams(location.hash.slice(1)), p = {};
+  if (q.has('site') && SITES.some((x) => x.id === q.get('site'))) p.siteId = q.get('site');
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('date') || '');
+  if (m) p.day = Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - START) / 86400000);
+  const h = Number(q.get('hour')), k = Array.from({ length: SPD }, (_, i) => dateAt(i).getUTCHours()).indexOf(h);
+  if (q.has('hour') && k >= 0) p.hourIdx = k;
+  const n = Number(q.get('days')); if (n >= 1 && n <= 30) p.dur = Math.round(n);
+  const e = Number(q.get('earth')); if (q.has('earth') && [0, 2, 5].includes(e)) p.thr = e;
+  if (q.get('terrain') === 'smooth' || q.get('terrain') === 'lola') p.terrain = q.get('terrain') === 'lola';
+  Object.assign(st, p);
+  if (p.day != null) st.ws = null;
+}
+function writeHash() {
+  if (!hashReady || !SITES.some((x) => x.id === st.siteId)) return;
+  const x = dateAt(Lidx(st.day));
+  const h = '#site=' + st.siteId + '&date=' + x.getUTCFullYear() + '-' + pad2(x.getUTCMonth() + 1) + '-' + pad2(x.getUTCDate()) +
+    '&hour=' + pad2(x.getUTCHours()) + '&days=' + st.dur + '&earth=' + st.thr + '&terrain=' + (st.terrain ? 'lola' : 'smooth');
+  if (location.hash !== h) history.replaceState(null, '', h);
+}
+
 function renderAll() {
   renderControls();
   renderCalendar(false);
@@ -496,6 +519,7 @@ function renderAll() {
   renderSuggest();
   renderMission();
   renderNow();
+  writeHash();
 }
 
 // ---------- events ----------
@@ -579,7 +603,9 @@ Promise.all([getJSON('data/ephemeris.json'), getJSON('data/sites.json')]).then((
   $('thrOpts').innerHTML = [0, 2, 5].map((v) => '<button type="button" class="btn opt" data-v="' + v + '" aria-pressed="false">' + v + '°</button>').join('');
   for (const b of $('thrOpts').children) b.addEventListener('click', () => set({ thr: Number(b.dataset.v) }));
   bind();
+  readHash();
   norm();
+  hashReady = true;
   renderVerification();
   renderAll();
 }).catch((err) => {

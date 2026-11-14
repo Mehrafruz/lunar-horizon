@@ -4,6 +4,10 @@ A web page for the NASA Space Apps Challenge 2026, challenge **Lunar Landing Sit
 
 **Live page: https://mehrafruz.github.io/lunar-horizon/**
 
+Slides: https://mehrafruz.github.io/lunar-horizon/slides/ (arrow keys; N for speaker notes;
+[PDF](docs/slides/lunar-horizon-slides.pdf)). A scenario can be linked directly, for example
+https://mehrafruz.github.io/lunar-horizon/#site=im2&date=2026-12-15&hour=00&days=14&earth=2&terrain=lola
+
 Pick a landing site and a landing time on the Moon. The page shows when you have sunlight (power) and
 Earth in view (direct link), and which site and day are best if the launch slips.
 
@@ -54,6 +58,7 @@ python3 pipeline/horizons_check.py
 | `docs/sky-core.js` | All geometry: azimuth, elevation, horizon, landing score |
 | `docs/app.js` | Page state and drawing |
 | `docs/terrain3d.js` | 3-D terrain view (three.js) |
+| `docs/slides/` | Seven slides for a live pitch, with the screenshots they use and a PDF copy |
 | `docs/data/ephemeris.json` | Sub-solar and sub-Earth points and Earth distance (DE421) |
 | `docs/data/sites.json` | Sites, with ground height and a 1440-value horizon mask for sites south of 75°S |
 | `docs/data/terrain/<id>.json` | Heights around each polar site (161 × 161, 240 m apart) for the 3-D view |
