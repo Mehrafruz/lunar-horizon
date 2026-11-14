@@ -121,7 +121,7 @@
     <div class="sec-head">
       <div class="cal-title">
         <h2>If the launch slips: which site, which day?</h2>
-        <span class="sub">Touchdown at <span id="hourLabel">—</span> UTC, <span id="durLabel2">—</span> mission. Brighter = longer unbroken Sun + Earth from touchdown. Point at a cell to read it; click to choose it.</span>
+        <span class="sub">Touchdown at <span id="hourLabel">—</span> UTC, <span id="durLabel2">—</span> mission. Brighter = longer unbroken Sun + Earth from touchdown. Each row is one point, not a whole region. Point at a cell to read it; click to choose it.</span>
       </div>
       <div class="stepper">
         <button type="button" class="btn sq short" id="wsPrev" aria-label="Previous 30 days">‹</button>
@@ -130,9 +130,6 @@
       </div>
     </div>
 
-    <div class="readout" aria-live="polite" id="readout">Loading ephemeris…</div>
-    <div class="suggest" id="suggest" aria-label="Suggestions if the launch slips"></div>
-
     <div class="cal-scroll">
       <div class="grid" id="grid" tabindex="0" role="application" aria-label="Delay calendar. Arrow keys move between days and sites.">
         <div class="grid-head"><span class="gutter"></span><div class="ticks" id="dayTicks"></div></div>
@@ -140,12 +137,16 @@
       </div>
     </div>
 
+    <!-- Below the grid, so the cells do not move when these lines change height. -->
+    <div class="readout" aria-live="polite" id="readout">Loading ephemeris…</div>
+    <div class="suggest" id="suggest" aria-label="Suggestions if the launch slips"></div>
+
     <div class="legend">
       <div class="lg"><span>Unbroken Sun + Earth from touchdown:</span><span>short</span>
         <i style="background:#1F3A5A"></i><i style="background:#245E86"></i><i style="background:#2E86A6"></i><i style="background:#6BC3B8"></i><i style="background:#F2E7A1"></i>
         <span>whole mission</span></div>
       <div class="lg"><i style="background:#151A23;box-shadow:inset 0 0 0 1px #3A4558"></i><span>Sun or Earth down at touchdown</span></div>
-      <div class="lg"><i style="background:#2E86A6;box-shadow:inset 0 0 0 2px #FFFFFF,0 0 0 1px #070A10"></i><span>Your choice</span></div>
+      <div class="lg"><i style="background:#2E86A6;box-shadow:inset 0 0 0 1px #070A10,0 0 0 2px #FFFFFF"></i><span>Your choice</span></div>
     </div>
 
     <div class="overview">
@@ -158,7 +159,7 @@
   <section class="card data" aria-label="Data and verification">
     <div class="col wide">
       <h2>Check against JPL Horizons</h2>
-      <span class="sub">Two points, six dates, observer on the surface. Each cell: Horizons value / this page, in degrees.</span>
+      <span class="sub">Two points, six dates, observer on the surface. Each cell: Horizons value / this page, in degrees. This checks the directions to the Sun and Earth on a smooth Moon; the terrain horizon is not part of it.</span>
       <div class="vt-scroll" id="vtable">Loading…</div>
       <span class="hint" id="vnote"></span>
     </div>
@@ -167,7 +168,7 @@
       <span><a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a> — reference for Sun and Earth positions. <a href="https://quickmap.lroc.asu.edu/">LROC Quickmap</a> — maps and average illumination for any site. <a href="https://trek.nasa.gov/moon/">NASA Moon Trek</a> — 3D terrain. <a href="https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/">CSA Moon exploration</a> — Canada's lunar missions.</span>
       <span>Terrain: <a href="https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/">NASA LRO LOLA polar elevation model</a> (LDEM_75S_240M). For each site south of 75°S we computed the skyline in 1440 directions, 2 m above the ground.</span>
       <span>What this page adds: a site × landing-date calendar that answers “the launch slipped — where and when now?” in one view.</span>
-      <span>Sites: IM-1, IM-2, Chandrayaan-3, Apollo 11 from LROC landing-site images. Artemis regions are 15 × 15 km; NASA has not published centre points, so each point here is one we picked inside the region.</span>
+      <span>Sites: IM-1, IM-2, Chandrayaan-3, Apollo 11 from LROC landing-site images. Artemis regions are 15 × 15 km; we did not find published centre points, so each point here is one we picked inside the region.</span>
       <span><b>Use of AI:</b> this page, its calculation code, the ephemeris script and the terrain script were written with Claude (Anthropic) during the hackathon. Site coordinates were researched with AI help and checked against LROC. Design choices were reviewed with AI critiques.</span>
     </div>
   </section>
@@ -186,7 +187,7 @@
     <section class="card why" aria-label="Why it matters">
       <div><b>Why is the Sun so low?</b><span>The Moon's axis is tilted only 1.5°. At 84°S the Sun never rises more than about 8°, and closer to the pole even less. Press “True scale” to see how flat that is.</span></div>
       <div><b>Why does Earth move?</b><span>Earth stays in almost the same part of the sky, but the Moon's wobble (libration) swings it about 7° up, down and sideways every month. Near the pole that is enough to drop it below the horizon.</span></div>
-      <div><b>What is not modelled</b><span>Terrain finer than 240 m and terrain north of 75°S; ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
+      <div><b>What is not modelled</b><span>Terrain finer than 240 m and terrain north of 75°S. Each site is one point: on a ridge, a point a few hundred metres away can see a quite different horizon. ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
     </section>
   </div>
 

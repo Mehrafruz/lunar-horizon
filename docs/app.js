@@ -18,7 +18,7 @@ const pad2 = (n) => String(n).padStart(2, '0');
 let E, N, STEP_H, SPD, START;
 let SITES = [];
 const custom = [];
-const st = { siteId: 'im2', day: 30, ws: null, hourIdx: 0, dur: 14, thr: 2, trueScale: false, terrain: true, t: 0, hover: null };
+const st = { siteId: 'im2', day: 31, ws: null, hourIdx: 0, dur: 14, thr: 2, trueScale: false, terrain: true, t: 0, hover: null };
 let timer = null;
 
 // ---------- caches ----------
@@ -140,7 +140,8 @@ function renderCalendar(force) {
     b.type = 'button'; b.tabIndex = -1; b.className = 'site-btn' + (x.id === s.id ? ' sel' : '');
     b.innerHTML = '<span class="n"></span><span class="t"></span>';
     b.firstChild.textContent = x.name; b.lastChild.textContent = x.tag + (st.terrain && !x.mask_deg ? ' · smooth Moon' : '');
-    b.addEventListener('click', () => set({ siteId: x.id, t: 0 }));
+    // The buttons are rebuilt on every render, so keep keyboard focus in the calendar.
+    b.addEventListener('click', () => { set({ siteId: x.id, t: 0 }); $('grid').focus({ preventScroll: true }); });
     return b;
   }));
 
@@ -170,9 +171,14 @@ function drawCalendar() {
       const d = st.ws + k, v = cellValue(x, d), cx = k * cw, ww = Math.max(1, cw - 1);
       ctx.fillStyle = colorOf(v); ctx.fillRect(cx, y, ww, ROW_H);
       if (v === -2) ring(ctx, cx, y, ww, ROW_H, 1, '#2A3343');
-      if (x.id === s.id && d === st.day) { ring(ctx, cx - 1, y - 1, ww + 2, ROW_H + 2, 1, '#070A10'); ring(ctx, cx, y, ww, ROW_H, 2, '#FFFFFF'); }
     }
   });
+  // Selected cell last, so its white frame (2 px outside the cell, dark edge inside) shows on every colour.
+  const si = sites.indexOf(s), k = st.day - st.ws;
+  if (si >= 0 && k >= 0 && k < WIN) {
+    const cx = k * cw, y = si * (ROW_H + ROW_GAP), ww = Math.max(1, cw - 1);
+    ring(ctx, cx - 2, y - 2, ww + 4, ROW_H + 4, 2, '#FFFFFF'); ring(ctx, cx, y, ww, ROW_H, 1, '#070A10');
+  }
 }
 
 // Week overview for the selected site (best touchdown in each week), cached per site/scenario.
@@ -226,7 +232,8 @@ function renderSuggest() {
     a.className = 'lead'; a.textContent = lead; div.append(a);
     if (label) {
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'btn'; b.textContent = label; b.addEventListener('click', onPick);
+      b.type = 'button'; b.className = 'btn'; b.textContent = label;
+      b.addEventListener('click', () => { onPick(); $('grid').focus({ preventScroll: true }); });
       div.append(b, document.createTextNode(tail));
     }
     return div;
@@ -335,11 +342,11 @@ function renderNow() {
 
   const ref = mask ? 'horizontal' : 'horizon';
   const hzThere = (el, clr) => mask ? ' · terrain horizon there ' + fmtDeg(el - clr) : '';
-  const when = (h) => h === null ? 'no change before Dec 2030 (end of data)' : 'in ≈ ' + fmtH(h);
+  const until = (state, change, h) => h === null ? state + ' to the end of the data (Dec 2030)' : state + ' — ' + change + ' in ≈ ' + fmtH(h);
   const sCross = hoursToCrossing(S.sClr, 0, iNow, STEP_H), eCross = hoursToCrossing(S.eClr, thr, iNow, STEP_H);
-  const sunState = sClr >= 0 ? 'Up — sets ' + when(sCross) : 'Down — rises ' + when(sCross);
-  const earthState = eClr >= thr ? 'Usable — drops below ' + thr + '° ' + when(eCross)
-    : (eClr > 0 ? 'Too low (under ' + thr + '°) — usable ' + when(eCross) : 'Below the horizon — usable ' + when(eCross));
+  const sunState = sClr >= 0 ? until('Up', 'sets', sCross) : until('Down', 'rises', sCross);
+  const earthState = eClr >= thr ? until('Usable', 'drops below ' + thr + '°', eCross)
+    : until(eClr > 0 ? 'Too low (under ' + thr + '°)' : 'Below the horizon', 'usable', eCross);
   $('sky').setAttribute('aria-label', 'Sky at ' + s.name + ' on ' + dtLabel(iNow) + '. Sun ' + S.sEl[iNow].toFixed(1) + ' degrees above the ' + ref + ', ' + sunState + '. Earth ' + S.eEl[iNow].toFixed(1) + ' degrees, ' + earthState + '.');
   $('panoNote').textContent = (polar ? 'Centred on the direction to Earth. ' : 'Centred on ' + (s.lat < 0 ? 'south' : 'north') + '. ') +
     (st.trueScale ? 'True scale: 1° up is as tall as 1° across.' : (ex > 1.05 ? 'Height stretched ×' + ex.toFixed(1) + ' so low angles are visible.' : 'Height shown at about true scale.')) +
@@ -393,7 +400,7 @@ async function renderVerification() {
   const sites = [...new Set(hz.rows.map((r) => r.site + ' = ' + Math.abs(r.lat) + '°' + (r.lat < 0 ? 'S ' : 'N ') + Math.abs(r.lon) + '°' + (r.lon >= 0 ? 'E' : 'W') + ' (' + r.label + ')'))];
   const meanSun = sunAzSum / hz.rows.length;
   $('vnote').textContent = (allOk ? 'All ' + hz.rows.length + ' checks within ' + tol + '°' : 'Some checks are outside ' + tol + '°') + '; largest difference ' + worst.toFixed(4) + '°. ' +
-    'Mean Sun-azimuth difference (this page − Horizons): ' + (meanSun >= 0 ? '+' : '−') + Math.abs(meanSun).toFixed(4) + '°, same sign at every point; cause not investigated. ' +
+    'Mean Sun-azimuth difference (this page − Horizons): ' + (meanSun >= 0 ? '+' : '−') + Math.abs(meanSun).toFixed(4) + '°, same sign at every point. Horizons gives apparent positions; our ephemeris is geometric. Adding light-time and aberration of light (about 0.0057°) to our Sun direction removes the offset (checked once, outside the page). ' +
     sites.join('; ') + '. Horizons answers fetched ' + hz.checked + ' by pipeline/horizons_check.py (raw files are in the repository).';
 }
 

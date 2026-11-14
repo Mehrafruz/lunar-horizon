@@ -74,13 +74,13 @@ button { cursor: pointer; }
 .cal { display: flex; flex-direction: column; gap: 10px; }
 .cal-title { display: flex; flex-direction: column; gap: 2px; }
 .win-label { font-size: 14px; min-width: 190px; }
-.readout { min-height: 44px; display: flex; align-items: center; padding: 8px 12px; border-radius: 10px; background: #151B26; font-size: 14px; line-height: 1.4; }
-.suggest { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; line-height: 1.4; }
-.suggest > div { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.readout { min-height: 56px; display: flex; align-items: center; padding: 8px 12px; border-radius: 10px; background: #151B26; font-size: 14px; line-height: 1.4; }
+.suggest { display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.4; }
+.suggest > div { min-height: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .suggest .lead { color: #C3CCD8; }
 .suggest .btn { height: 36px; padding: 0 12px; font-size: 14px; }
 .cal-scroll { overflow-x: auto; }
-.grid { min-width: 920px; display: flex; flex-direction: column; gap: 4px; outline-offset: 4px; }
+.grid { min-width: 920px; display: flex; flex-direction: column; gap: 4px; outline-offset: -2px; }
 .grid-head, .grid-body { display: flex; gap: 10px; }
 .grid-head { align-items: flex-end; }
 .gutter { width: 220px; flex: none; }

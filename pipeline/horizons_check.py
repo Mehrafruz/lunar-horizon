@@ -13,7 +13,7 @@ Run from the repository root (Python 3 standard library only, no pip install):
 Writes:
     pipeline/horizons_out/<site>_<body>_<date>.txt   raw Horizons answers (kept as evidence)
     docs/data/horizons_check.json                    table shown on the page
-Prints a Markdown table. Pass = |d_az| and |d_el| <= 0.02 deg for all 24 values.
+Prints a Markdown table. Pass = |d_az| and |d_el| <= 0.02 deg for all 48 values (12 checks x 4 angles).
 """
 import json, os, sys, time, urllib.parse, urllib.request
 
@@ -26,7 +26,7 @@ SITES = {"A": (-84.8, 29.2, "near IM-2 Athena"), "B": (-88.74, 124.5, "most-illu
 DATES = ["2026-12-21 00:00", "2027-03-10 06:00", "2027-06-01 12:00",
          "2028-02-15 18:00", "2029-09-30 03:00", "2030-12-01 00:00"]
 
-# Our values: node, sky-core.js computeSite(E, {lat, lon}, 0) on docs/data/ephemeris.json (DE421).
+# Our values, copied here by hand (not recomputed by this script): node, sky-core.js computeSite(E, {lat, lon}, 0) on docs/data/ephemeris.json (DE421).
 # (site, date) -> (sun az, sun el, earth az, earth el), degrees.
 OURS = {
     ("A", "2026-12-21 00:00"): (7.4542, 6.4187, 324.1549, 10.5548),

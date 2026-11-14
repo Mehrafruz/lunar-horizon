@@ -82,7 +82,12 @@ within 0.02° of Horizons. All 12 checks pass; the largest difference is 0.006°
 | B | 2030-12-01 00:00 | 344.590 / 344.596 | 1.169 / 1.169 | 242.665 / 242.665 | 5.883 / 5.883 | 0.0053 |
 
 A = 84.8°S 29.2°E, B = 88.74°S 124.5°E. Our Sun azimuth is larger than Horizons by about 0.0055° at every
-point. We did not investigate the cause.
+point. Horizons gives apparent positions, our ephemeris is geometric: adding light-time and aberration of light
+(about 0.0057°) to our Sun direction removes the offset (checked once with a script outside the repository).
+
+This check covers the directions to the Sun and Earth on a smooth Moon only, not the terrain horizon.
+`pipeline/horizons_check.py` compares Horizons with values copied from `sky-core.js` into the script; the
+table on the page recomputes our side live in the browser.
 
 ## Terrain
 
@@ -92,7 +97,9 @@ in 120 m steps to the edge of the map, reads the height bilinearly and keeps the
 Tests (`pipeline/tests/`): a flat map gives the 2 m dip (−0.0869°) in every direction; latitude/longitude →
 pixel → latitude/longitude returns to the same point; the centre of Shackleton crater is 3.9 km below a
 10 km ring around it and sees a 20–24° horizon all round; a synthetic hill at the IM-2 site appears at the
-right azimuth (191.85°) from a point near the pole.
+right azimuth (191.85°) and height from a point near the pole 167 km away. That hill is a 20 km block: a 1 km
+hill at that distance is hidden below the horizon by the Moon's curvature (the test checks this too).
+The Shackleton and hillshade tests need the downloaded elevation model and are skipped without it.
 
 ## Limits
 
@@ -103,11 +110,15 @@ right azimuth (191.85°) from a point near the pole.
 - **3-hour time step.** Rise and set times between samples are interpolated.
 - **"Most-illuminated point".** Bussey et al. (2010) report about 86% sunlit for a point near this site. At the
   coordinates we use (88.74°S 124.5°E) our LOLA masks give the Sun's centre above the horizon for 60% of
-  Nov 2026 – Dec 2030, and the label on the page says so. The nearest ridge pixel in the 240 m model
-  (88.807°S 123.637°E) gives 86%. We did not move the point. Results near sharp ridges depend strongly on the exact point.
+  Nov 2026 – Dec 2030, and the label on the page says so. The highest pixel of the 240 m model within 3 km
+  (88.807°S 123.637°E, 2.1 km away) gives 86%. We did not move the point. The paper used Kaguya topography,
+  not LOLA, so we do not claim agreement with it.
+- **Each site is one point, not a region.** Near ridges, a point a few hundred metres away can see a quite
+  different horizon, so a row in the calendar describes that point only. The Bussey point above shows how large
+  the difference can be.
 - **Line of sight only.** Ground-station schedules, relay satellites, slopes, shadows on the lander itself
   and thermal limits are not modelled.
-- **Artemis points are ours.** NASA has not published centre points for the candidate regions.
+- **Artemis points are ours.** We did not find published centre points for the candidate regions.
 
 ## Use of AI
 

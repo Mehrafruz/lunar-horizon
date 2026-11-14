@@ -62,7 +62,11 @@ class Direction(unittest.TestCase):
         peak = mask.argmax() * 360.0 / lm.N_AZ
         print(f"  1 km bump hidden below the horizon: {hidden}; 20 km bump: peak {mask.max():.2f} deg at azimuth {peak:.2f}")
         self.assertTrue(hidden)
-        self.assertGreater(mask.max(), 1.0)
+        # Height check: the top of a 20 km block at that distance, seen from 2 m on a flat sphere.
+        R, th = lm.R, dist / lm.R
+        expect = np.degrees(np.arctan2((R + 20000) * np.cos(th) - (R + lm.H_OBS), (R + 20000) * np.sin(th)))
+        print(f"  expected peak about {expect:.2f} deg (block centre; the near edge is slightly higher)")
+        self.assertAlmostEqual(mask.max(), expect, delta=0.1)
         self.assertAlmostEqual(peak, 191.85, delta=0.5)
         self.assertGreater(abs(peak - 136.6), 10)       # where it would be with mirrored longitude
 
