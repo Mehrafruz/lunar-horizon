@@ -207,6 +207,50 @@ function renderReadout() {
   $('readout').textContent = hs ? describe(hs, st.hover.d) : describe(curSite(), st.day);
 }
 
+// ---------- slip helper: best day at this site, best site on this day ----------
+const SLIP = 14;   // days searched on each side of the chosen landing day
+// Rank of a landing: unbroken Sun + Earth share from touchdown, then the total Sun + Earth share.
+function rank(s, d) {
+  const v = cellValue(s, d);
+  if (v < 0) return [-1, 0];
+  const T = table(s, st.thr), L = Lidx(d), n = steps();
+  return [v, (T.pre[L + n] - T.pre[L]) / n];
+}
+const better = (a, b) => a[0] > b[0] + 1e-9 || (Math.abs(a[0] - b[0]) <= 1e-9 && a[1] > b[1] + 1e-9);
+
+function renderSuggest() {
+  const s = curSite(), n = steps(), cur = rank(s, st.day), date = dLabel(Lidx(st.day));
+  const what = (r) => fmtH(r[0] * n * STEP_H) + ' unbroken Sun + Earth from touchdown, ' + Math.round(r[1] * 100) + '% in total';
+  const line = (lead, label, onPick, tail) => {
+    const div = document.createElement('div'), a = document.createElement('span');
+    a.className = 'lead'; a.textContent = lead; div.append(a);
+    if (label) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn'; b.textContent = label; b.addEventListener('click', onPick);
+      div.append(b, document.createTextNode(tail));
+    }
+    return div;
+  };
+  // Nearest days first (later before earlier), so equal ranks keep the smallest slip.
+  let bd = st.day, br = cur;
+  for (let k = 1; k <= SLIP; k++) for (const d of [st.day + k, st.day - k]) {
+    if (d < 0 || d > lastDay()) continue;
+    const r = rank(s, d);
+    if (better(r, br)) { br = r; bd = d; }
+  }
+  let bs = s, bsr = cur;
+  for (const x of allSites()) { const r = rank(x, st.day); if (better(r, bsr)) { bsr = r; bs = x; } }
+
+  const slip = bd - st.day;
+  const dayLine = br[0] < 0 ? line('No day within ±' + SLIP + ' days at ' + s.name + ' has Sun and Earth up at touchdown.')
+    : bd === st.day ? line(date + ' is already the best day at ' + s.name + ' within ±' + SLIP + ' days.')
+    : line('Best day at ' + s.name + ' within ±' + SLIP + ' days:', dLabel(Lidx(bd)) + ' (' + (slip > 0 ? '+' : '−') + Math.abs(slip) + ' d)', () => setDay(bd), '— ' + what(br));
+  const siteLine = bsr[0] < 0 ? line('No site has Sun and Earth up at touchdown on ' + date + '.')
+    : bs === s ? line(s.name + ' is already the best site on ' + date + '.')
+    : line('Best site on ' + date + ':', bs.name, () => set({ siteId: bs.id, t: 0 }), '— ' + what(bsr) + (st.terrain && !bs.mask_deg ? ' (smooth Moon, no terrain)' : ''));
+  $('suggest').replaceChildren(dayLine, siteLine);
+}
+
 // ---------- mission summary (fixed for a scenario) ----------
 function renderMission() {
   const s = curSite(), S = series(s), T = table(s, st.thr), L0 = Lidx(st.day), n = steps();
@@ -354,6 +398,7 @@ function renderAll() {
   renderControls();
   renderCalendar(false);
   renderReadout();
+  renderSuggest();
   renderMission();
   renderNow();
 }
