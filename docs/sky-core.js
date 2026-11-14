@@ -58,7 +58,8 @@ export function computeSite(E, site, hObsM = 2) {
   const N = E.sLat.length, hKm = ((site.h0_m || 0) + hObsM) / 1000;
   const F = frame(site.lat, site.lon), P = vec(site.lat, site.lon, R_MOON + hKm);
   const d0 = dip(hObsM / 1000);
-  const horizon = site.mask_deg ? (az) => Math.max(d0, maskAt(site.mask_deg, az)) : () => d0;
+  // The mask is the horizon as it is: on a summit it lies below the smooth-Moon dip, so it must not be clamped to d0.
+  const horizon = site.mask_deg ? (az) => maskAt(site.mask_deg, az) : () => d0;
   const S = {
     sAz: new Float32Array(N), sEl: new Float32Array(N), sClr: new Float32Array(N),
     eAz: new Float32Array(N), eEl: new Float32Array(N), eClr: new Float32Array(N), eR: new Float32Array(N),

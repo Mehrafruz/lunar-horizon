@@ -26,7 +26,8 @@ const seriesCache = new Map(), tableCache = new Map();
 const siteKey = (s) => s.lat.toFixed(4) + ',' + s.lon.toFixed(4);
 function series(s) {
   const k = siteKey(s);
-  if (!seriesCache.has(k)) seriesCache.set(k, computeSite(E, s, H_OBS_M));
+  // Smooth Moon only until step 4: sites.json already carries LOLA masks, but the page does not use them yet.
+  if (!seriesCache.has(k)) seriesCache.set(k, computeSite(E, { lat: s.lat, lon: s.lon }, H_OBS_M));
   return seriesCache.get(k);
 }
 function table(s, thr) {
