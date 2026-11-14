@@ -101,9 +101,10 @@ right azimuth (191.85°) from a point near the pole.
 - **Terrain north of 75°S is not included.** Chandrayaan-3, Apollo 11 and points you add use a smooth Moon.
   The calendar marks those rows.
 - **3-hour time step.** Rise and set times between samples are interpolated.
-- **"Most-illuminated point".** At the coordinates we use (88.74°S 124.5°E) our masks give the Sun's centre
-  above the horizon for 60% of Nov 2026 – Dec 2030, not the ~86% in the tag. The nearest ridge pixel in the
-  240 m model (88.807°S 123.637°E) gives 86%. Results near sharp ridges depend strongly on the exact point.
+- **"Most-illuminated point".** Bussey et al. (2010) report about 86% sunlit for a point near this site. At the
+  coordinates we use (88.74°S 124.5°E) our LOLA masks give the Sun's centre above the horizon for 60% of
+  Nov 2026 – Dec 2030, and the label on the page says so. The nearest ridge pixel in the 240 m model
+  (88.807°S 123.637°E) gives 86%. We did not move the point. Results near sharp ridges depend strongly on the exact point.
 - **Line of sight only.** Ground-station schedules, relay satellites, slopes, shadows on the lander itself
   and thermal limits are not modelled.
 - **Artemis points are ours.** NASA has not published centre points for the candidate regions.
