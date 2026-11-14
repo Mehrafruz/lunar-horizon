@@ -1,7 +1,7 @@
 // Written with assistance from Claude Code (Anthropic).
 // Lunar Horizon — page logic, ported from reference/prototype-v2.dc.html.
 // All geometry comes from sky-core.js; this file only does state, caching and drawing.
-import { SUN_R, discFrac, dip, maskAt, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
+import { SUN_R, discFrac, dip, maskAt, earthPhase, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
 
 const H_OBS_M = 2;                     // panel/antenna height above the ground
 const DIP = dip(H_OBS_M / 1000);       // smooth-Moon horizon for that observer
@@ -159,6 +159,12 @@ function renderCalendar(force) {
 
   drawCalendar();
   renderOverview(force);
+  // Narrow screens scroll the grid sideways: keep the chosen day in view.
+  const sc = $('calCv').closest('.cal-scroll');
+  if (sc.scrollWidth > sc.clientWidth + 1) {
+    const cv = $('calCv'), left = cv.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft;
+    sc.scrollLeft = left + (st.day - st.ws + 0.5) * cv.clientWidth / WIN - (sc.clientWidth + $('siteCol').offsetWidth) / 2;
+  }
 }
 
 function drawCalendar() {
@@ -170,7 +176,7 @@ function drawCalendar() {
     for (let k = 0; k < WIN; k++) {
       const d = st.ws + k, v = cellValue(x, d), cx = k * cw, ww = Math.max(1, cw - 1);
       ctx.fillStyle = colorOf(v); ctx.fillRect(cx, y, ww, ROW_H);
-      if (v === -2) ring(ctx, cx, y, ww, ROW_H, 1, '#2A3343');
+      if (v === -2) ring(ctx, cx, y, ww, ROW_H, 1, '#3A4A6A');
     }
   });
   // Selected cell last, so its white frame (2 px outside the cell, dark edge inside) shows on every colour.
@@ -305,39 +311,48 @@ function renderNow() {
     return out;
   };
   const stepDeg = st.trueScale ? (hi > 40 ? 30 : 10) : (hi - lo > 20 ? 10 : (hi - lo > 8 ? 2 : 1));
-  const svg = [];
-  for (let g = Math.ceil(lo / stepDeg) * stepDeg; g <= (st.trueScale ? 80 : hi); g += stepDeg) {
+  const narrow = $('sky').clientWidth < 560;            // phone: larger text and discs inside the 1000-unit drawing
+  const fs = narrow ? 24 : 13, minR = narrow ? 5 : 3;
+  const gStep = narrow ? stepDeg * 2 : stepDeg;         // fewer grid labels when they are large
+  const svg = ['<defs>',
+    '<linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050814"/><stop offset="1" stop-color="#101B36"/></linearGradient>',
+    '<linearGradient id="gGround" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9AA3B3"/><stop offset="1" stop-color="#4E5666"/></linearGradient>',
+    '<radialGradient id="gSunGlow"><stop offset="0" stop-color="#FFE6A8" stop-opacity="0.5"/><stop offset="0.35" stop-color="#FFC24B" stop-opacity="0.18"/><stop offset="1" stop-color="#FFC24B" stop-opacity="0"/></radialGradient>',
+    '<radialGradient id="gEarthGlow"><stop offset="0.55" stop-color="#7CC0FF" stop-opacity="0.4"/><stop offset="1" stop-color="#7CC0FF" stop-opacity="0"/></radialGradient>',
+    '</defs>', '<rect width="1000" height="250" fill="url(#gSky)"/>'];
+  for (let g = Math.ceil(lo / gStep) * gStep; g <= (st.trueScale ? 80 : hi); g += gStep) {
     const gy = Y(g);
-    if (gy > 8 && gy < 228) svg.push('<line x1="44" x2="1000" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="#1C2432"/><text x="6" y="' + (gy + 4).toFixed(1) + '" fill="#A7B2C2" font-size="13" font-family="Inter">' + g + '°</text>');
+    if (gy > 8 && gy < 228) svg.push('<line x1="44" x2="1000" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="#1B2742"/><text x="6" y="' + (gy + fs / 3).toFixed(1) + '" fill="#8FA3C8" font-size="' + fs + '" font-family="Inter, system-ui, sans-serif">' + g + '°</text>');
   }
   for (const p of segs(S.sAz, S.sEl)) svg.push('<polyline points="' + p + '" fill="none" stroke="#FFC24B" stroke-opacity="0.6" stroke-width="2" stroke-dasharray="3 4"/>');
   for (const p of segs(S.eAz, S.eEl)) svg.push('<polyline points="' + p + '" fill="none" stroke="#6CB6FF" stroke-opacity="0.7" stroke-width="2" stroke-dasharray="3 4"/>');
 
   const sClr = S.sClr[iNow], eClr = S.eClr[iNow];
   const sunUp = sClr > -SUN_R, earthUp = eClr > -S.eR[iNow];
-  const rx = (r) => Math.max(3, r * pxDeg).toFixed(1), ry = (r) => Math.max(3, r * vy).toFixed(1);
-  const sun = 'cx="' + Xa(S.sAz[iNow]).toFixed(1) + '" cy="' + Y(S.sEl[iNow]).toFixed(1) + '" rx="' + rx(SUN_R) + '" ry="' + ry(SUN_R) + '"';
-  const earth = 'cx="' + Xa(S.eAz[iNow]).toFixed(1) + '" cy="' + Math.max(4, Y(S.eEl[iNow])).toFixed(1) + '" rx="' + rx(S.eR[iNow]) + '" ry="' + ry(S.eR[iNow]) + '"';
-  if (earthUp) svg.push('<ellipse ' + earth + ' fill="#6CB6FF" stroke="#D4EAFF" stroke-width="1.5"/>');
-  if (sunUp) svg.push('<ellipse ' + sun + ' fill="#FFC24B" stroke="#FFE7B0" stroke-width="1.5"/>');
+  const sunX = Xa(S.sAz[iNow]), sunY = Y(S.sEl[iNow]), earthX = Xa(S.eAz[iNow]), earthY = Math.max(4, Y(S.eEl[iNow]));
+  const rS = [Math.max(minR, SUN_R * pxDeg), Math.max(minR, SUN_R * vy)], rE = [Math.max(minR, S.eR[iNow] * pxDeg), Math.max(minR, S.eR[iNow] * vy)];
+  const ell = (x, y, r, more) => '<ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="' + r[0].toFixed(1) + '" ry="' + r[1].toFixed(1) + '" ' + more + '/>';
+  const phase = earthPhase(S.sAz[iNow], S.sEl[iNow], S.eAz[iNow], S.eEl[iNow]);
+  if (earthUp) svg.push(ell(earthX, earthY, [rE[0] * 3.2, rE[1] * 1.35], 'fill="url(#gEarthGlow)"'), earthDisc(earthX, earthY, rE, phase));
+  if (sunUp) svg.push('<circle cx="' + sunX.toFixed(1) + '" cy="' + sunY.toFixed(1) + '" r="' + (rS[1] * 4).toFixed(1) + '" fill="url(#gSunGlow)"/>', ell(sunX, sunY, rS, 'fill="#FFF3D1" stroke="#FFC24B" stroke-width="1.5"'));
   if (mask) {
     // Terrain skyline from the LOLA mask, every 0.5° across the panorama.
     const pts = [];
     for (let k = 0; k <= 720; k++) pts.push((X0 + k * 0.5 * pxDeg).toFixed(1) + ',' + Math.min(249, Y(maskAt(mask, centre - 180 + k * 0.5))).toFixed(1));
-    svg.push('<polygon points="44,250 ' + pts.join(' ') + ' 1000,250" fill="#262E3C"/>');
-    svg.push('<polyline points="' + pts.join(' ') + '" fill="none" stroke="#7A879C" stroke-width="1.5" stroke-linejoin="round"/>');
+    svg.push('<polygon points="44,250 ' + pts.join(' ') + ' 1000,250" fill="url(#gGround)"/>');
+    svg.push('<polyline points="' + pts.join(' ') + '" fill="none" stroke="#E4E8EF" stroke-opacity="' + (sunUp ? 0.95 : 0.55) + '" stroke-width="1.5" stroke-linejoin="round"/>');
   } else {
     const groundY = Math.min(240, Y(DIP));
-    svg.push('<rect x="44" y="' + groundY.toFixed(1) + '" width="956" height="' + (250 - groundY).toFixed(1) + '" fill="#262E3C"/>');
-    svg.push('<line x1="44" x2="1000" y1="' + groundY.toFixed(1) + '" y2="' + groundY.toFixed(1) + '" stroke="#7A879C" stroke-width="1.5"/>');
+    svg.push('<rect x="44" y="' + groundY.toFixed(1) + '" width="956" height="' + (250 - groundY).toFixed(1) + '" fill="url(#gGround)"/>');
+    svg.push('<line x1="44" x2="1000" y1="' + groundY.toFixed(1) + '" y2="' + groundY.toFixed(1) + '" stroke="#E4E8EF" stroke-width="1.5"/>');
   }
-  if (!earthUp) svg.push('<ellipse ' + earth + ' fill="none" stroke="#6CB6FF" stroke-width="1.5" stroke-dasharray="3 3"/>');
-  if (!sunUp) svg.push('<ellipse ' + sun + ' fill="none" stroke="#FFC24B" stroke-width="1.5" stroke-dasharray="3 3"/>');
+  if (!earthUp) svg.push(ell(earthX, earthY, rE, 'fill="none" stroke="#6CB6FF" stroke-width="1.5" stroke-dasharray="3 3"'));
+  if (!sunUp) svg.push(ell(sunX, sunY, rS, 'fill="none" stroke="#FFC24B" stroke-width="1.5" stroke-dasharray="3 3"'));
   const compass = [[0, s.lat > 0 && polar ? 'N · pole' : 'N'], [90, 'E'], [180, s.lat < 0 ? 'S · pole' : 'S'], [270, 'W']]
-    .map(([az, l]) => [Xa(az), l, '#A7B2C2'])
-    .filter(([x]) => !polar || Math.abs(x - (X0 + PW / 2)) > 60);
-  if (polar) compass.push([X0 + PW / 2, '▼ toward Earth', '#7CC0FF']);
-  for (const [x, l, fill] of compass) svg.push('<text x="' + x.toFixed(1) + '" y="244" fill="' + fill + '" font-size="13" font-weight="600" font-family="Inter" text-anchor="middle">' + l + '</text>');
+    .map(([az, l]) => [Xa(az), l, '#F1F4F9'])
+    .filter(([x]) => !polar || Math.abs(x - (X0 + PW / 2)) > (narrow ? 120 : 60));
+  if (polar) compass.push([X0 + PW / 2, '▼ toward Earth', '#CFE6FF']);
+  for (const [x, l, fill] of compass) svg.push('<text x="' + x.toFixed(1) + '" y="' + (narrow ? 242 : 244) + '" fill="' + fill + '" font-size="' + fs + '" font-weight="600" font-family="Inter, system-ui, sans-serif" text-anchor="middle">' + l + '</text>');
   $('sky').innerHTML = svg.join('');
 
   const ref = mask ? 'horizontal' : 'horizon';
@@ -351,7 +366,7 @@ function renderNow() {
   $('panoNote').textContent = (polar ? 'Centred on the direction to Earth. ' : 'Centred on ' + (s.lat < 0 ? 'south' : 'north') + '. ') +
     (st.trueScale ? 'True scale: 1° up is as tall as 1° across.' : (ex > 1.05 ? 'Height stretched ×' + ex.toFixed(1) + ' so low angles are visible.' : 'Height shown at about true scale.')) +
     ' Sun and Earth are drawn at their real size. Dashed: their paths during the mission; a dashed outline means below the horizon.' +
-    (mask ? ' Grey: the terrain skyline from LOLA.' : '');
+    ' Earth shows its phase: the lit side faces the Sun.' + (mask ? ' Grey: the terrain skyline from LOLA.' : '');
   $('nowLabel').textContent = dtLabel(iNow) + ' · mission day ' + (Math.floor(tt / SPD) + 1) + ' of ' + st.dur;
   $('tSlider').value = String(tt);
 
@@ -362,9 +377,35 @@ function renderNow() {
   $('earthEl').textContent = fmtDeg(S.eEl[iNow]);
   $('earthSub').textContent = 'above the ' + ref + ' · azimuth ' + Math.round(S.eAz[iNow]) + '°' + hzThere(S.eEl[iNow], eClr);
   $('earthState').textContent = earthState;
+  $('earthPhase').textContent = Math.round(phase.lit * 100) + '%';
+  $('sunGlyph').innerHTML = sunGlyph(sClr);
+  $('earthGlyph').innerHTML = earthGlyph(phase, earthUp);
 
   drawLane($('laneSun'), (j) => S.sClr[j] >= 0, '#FFC24B');
   drawLane($('laneEarth'), (j) => S.eClr[j] >= thr, '#6CB6FF');
+}
+
+// Earth with its phase: dark disc, the lit part turned towards the Sun, outline. r = [rx, ry] in SVG units.
+function earthDisc(x, y, r, ph) {
+  const tx = Math.abs(1 - 2 * ph.lit).toFixed(3), sweep = ph.lit < 0.5 ? 0 : 1;
+  return '<g transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + r[0].toFixed(2) + ',' + r[1].toFixed(2) + ')">' +
+    '<circle r="1" fill="#13233F"/>' +
+    // Lit part of a unit disc with the bright limb at +x, turned so that +x points along ph.limb (y grows downward).
+    '<path d="M0,-1 A1,1 0 0 1 0,1 A' + tx + ',1 0 0 ' + sweep + ' 0,-1 Z" transform="rotate(' + (ph.limb - 90).toFixed(1) + ')" fill="#8CC8FF"/>' +
+    '<circle r="1" fill="none" stroke="#D4EAFF" stroke-opacity="0.8" stroke-width="1" vector-effect="non-scaling-stroke"/></g>';
+}
+// Card icons at true shape: Earth with its phase; the Sun cut by a straight horizon at its clearance.
+function earthGlyph(ph, up) {
+  return '<defs><radialGradient id="gEarthIcon"><stop offset="0.6" stop-color="#7CC0FF" stop-opacity="0.45"/><stop offset="1" stop-color="#7CC0FF" stop-opacity="0"/></radialGradient></defs>' +
+    '<g opacity="' + (up ? 1 : 0.4) + '"><circle cx="38" cy="38" r="37" fill="url(#gEarthIcon)"/>' + earthDisc(38, 38, [24, 24], ph) + '</g>';
+}
+function sunGlyph(clr) {
+  const hy = 38 + clamp(clr / SUN_R, -1.2, 1.2) * 22;
+  return '<defs><radialGradient id="gSunIcon"><stop offset="0.3" stop-color="#FFE6A8" stop-opacity="0.8"/><stop offset="1" stop-color="#FFC24B" stop-opacity="0"/></radialGradient>' +
+    '<clipPath id="cSunIcon"><rect width="76" height="' + hy.toFixed(1) + '"/></clipPath></defs>' +
+    '<g clip-path="url(#cSunIcon)"><circle cx="38" cy="38" r="37" fill="url(#gSunIcon)"/><circle cx="38" cy="38" r="22" fill="#FFF3D1" stroke="#F2A900" stroke-width="2"/></g>' +
+    '<circle cx="38" cy="38" r="22" fill="none" stroke="#F2A900" stroke-opacity="0.5" stroke-width="1.5" stroke-dasharray="3 3"/>' +
+    '<line x1="2" x2="74" y1="' + hy.toFixed(1) + '" y2="' + hy.toFixed(1) + '" stroke="#5A6272" stroke-width="2"/>';
 }
 
 function drawLane(cv, up, color) {

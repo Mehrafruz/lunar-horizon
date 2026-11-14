@@ -10,6 +10,7 @@ Earth in view (direct link), and which site and day are best if the launch slips
 ## What it does
 
 - **Sky view** — Sun and Earth over the local horizon, with the terrain skyline, for every 3 hours of the mission.
+  Earth is drawn with its phase as seen from the site.
 - **Readouts** — Sun and Earth elevation and azimuth, share of the solar disc visible, time to the next rise or set.
 - **Delay calendar** — sites × landing dates. Colour = how long Sun and Earth stay up together, unbroken, from touchdown.
 - **Your own point** — any latitude and longitude (smooth Moon).

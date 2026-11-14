@@ -42,6 +42,17 @@ export function discFrac(c, r) {
   return (Math.acos(x) - x * Math.sqrt(1 - x * x)) / Math.PI;
 }
 
+// Earth's phase seen from the Moon, from the directions (deg) to the Sun and Earth. The Sun is so far away
+// that the phase angle at Earth is 180° − the Sun–Earth angle seen from here.
+// Returns lit = lit share of the disc (0…1) and limb = direction of the bright limb on the sky,
+// deg from straight up, positive towards increasing azimuth.
+export function earthPhase(sAz, sEl, eAz, eEl) {
+  const sa = sAz * D2R, se = sEl * D2R, ea = eAz * D2R, ee = eEl * D2R, da = sa - ea;
+  const cosPsi = Math.sin(se) * Math.sin(ee) + Math.cos(se) * Math.cos(ee) * Math.cos(da);
+  const limb = Math.atan2(Math.sin(da) * Math.cos(se), Math.cos(ee) * Math.sin(se) - Math.sin(ee) * Math.cos(se) * Math.cos(da)) / D2R;
+  return { lit: (1 - cosPsi) / 2, limb };
+}
+
 // Horizon dip of a smooth sphere for an observer h km above it (deg, negative).
 export function dip(hKm) { return -Math.acos(R_MOON / (R_MOON + hKm)) / D2R; }
 

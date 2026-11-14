@@ -67,7 +67,7 @@
   <p class="error" role="alert" id="error" hidden></p>
 
   <div class="main-row">
-    <section class="card sky" aria-label="Horizon view">
+    <section class="card sky dark" aria-label="Horizon view">
       <div class="sec-head">
         <h2>Sky at <span id="skyTitle">—</span></h2>
         <button type="button" class="btn small" id="scaleBtn" aria-pressed="false">True scale</button>
@@ -92,19 +92,26 @@
     </section>
 
     <section class="readouts" aria-label="Readouts">
-      <div class="card ro">
-        <span class="ro-kicker sun">SUN · POWER</span>
-        <span class="big" id="sunEl">—</span>
-        <span class="sub" id="sunSub">—</span>
-        <span class="sub"><span id="sunDisc">—</span> of the solar disc above the horizon</span>
-        <span class="state" id="sunState"></span>
+      <div class="card ro sun">
+        <svg class="glyph" id="sunGlyph" viewBox="0 0 76 76" aria-hidden="true"></svg>
+        <div class="ro-txt">
+          <span class="ro-kicker sun">SUN · POWER</span>
+          <span class="big" id="sunEl">—</span>
+          <span class="sub" id="sunSub">—</span>
+          <span class="sub"><span id="sunDisc">—</span> of the solar disc above the horizon</span>
+          <span class="state" id="sunState"></span>
+        </div>
       </div>
-      <div class="card ro">
-        <span class="ro-kicker earth">EARTH · LINE OF SIGHT</span>
-        <span class="big" id="earthEl">—</span>
-        <span class="sub" id="earthSub">—</span>
-        <span class="state" id="earthState"></span>
-        <span class="hint">Line of sight only. Ground-station schedules and relay satellites are not modelled.</span>
+      <div class="card ro earth">
+        <svg class="glyph" id="earthGlyph" viewBox="0 0 76 76" aria-hidden="true"></svg>
+        <div class="ro-txt">
+          <span class="ro-kicker earth">EARTH · LINE OF SIGHT</span>
+          <span class="big" id="earthEl">—</span>
+          <span class="sub" id="earthSub">—</span>
+          <span class="sub">Earth seen from here: <span id="earthPhase">—</span> lit, like a phase of the Moon</span>
+          <span class="state" id="earthState"></span>
+          <span class="hint">Line of sight only. Ground-station schedules and relay satellites are not modelled.</span>
+        </div>
       </div>
       <div class="card ro mission">
         <span class="ro-kicker">THIS MISSION</span>
@@ -130,11 +137,13 @@
       </div>
     </div>
 
+    <div class="cal-panel dark">
     <div class="cal-scroll">
       <div class="grid" id="grid" tabindex="0" role="application" aria-label="Delay calendar. Arrow keys move between days and sites.">
         <div class="grid-head"><span class="gutter"></span><div class="ticks" id="dayTicks"></div></div>
         <div class="grid-body"><div class="site-col" id="siteCol"></div><canvas id="calCv" class="cal-cv"></canvas></div>
       </div>
+    </div>
     </div>
 
     <!-- Below the grid, so the cells do not move when these lines change height. -->
@@ -146,10 +155,10 @@
         <i style="background:#1F3A5A"></i><i style="background:#245E86"></i><i style="background:#2E86A6"></i><i style="background:#6BC3B8"></i><i style="background:#F2E7A1"></i>
         <span>whole mission</span></div>
       <div class="lg"><i style="background:#151A23;box-shadow:inset 0 0 0 1px #3A4558"></i><span>Sun or Earth down at touchdown</span></div>
-      <div class="lg"><i style="background:#2E86A6;box-shadow:inset 0 0 0 1px #070A10,0 0 0 2px #FFFFFF"></i><span>Your choice</span></div>
+      <div class="lg"><i style="background:#2E86A6;box-shadow:inset 0 0 0 1px #070A10,0 0 0 2px #FFFFFF,0 0 0 3px #141A26"></i><span>Your choice</span></div>
     </div>
 
-    <div class="overview">
+    <div class="overview cal-panel dark">
       <span class="hint">Whole period for <span id="ovSite">—</span>, week by week (best touchdown in each week). Click to jump.</span>
       <canvas id="ovCv" class="ov-cv" aria-hidden="true"></canvas>
       <div class="ticks years" id="yearTicks"></div>
@@ -187,7 +196,7 @@
     <section class="card why" aria-label="Why it matters">
       <div><b>Why is the Sun so low?</b><span>The Moon's axis is tilted only 1.5°. At 84°S the Sun never rises more than about 8°, and closer to the pole even less. Press “True scale” to see how flat that is.</span></div>
       <div><b>Why does Earth move?</b><span>Earth stays in almost the same part of the sky, but the Moon's wobble (libration) swings it about 7° up, down and sideways every month. Near the pole that is enough to drop it below the horizon.</span></div>
-      <div><b>What is not modelled</b><span>Terrain finer than 240 m and terrain north of 75°S. Each site is one point: on a ridge, a point a few hundred metres away can see a quite different horizon. ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
+      <div><b>What is not modelled</b><span>Terrain finer than 240 m and terrain north of 75°S. Each site is one point: on a ridge, a point a few hundred metres away can see a quite different horizon. Also not modelled: ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
     </section>
   </div>
 
