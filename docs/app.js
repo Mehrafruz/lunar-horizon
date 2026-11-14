@@ -239,15 +239,18 @@ function renderSuggest() {
     if (better(r, br)) { br = r; bd = d; }
   }
   let bs = s, bsr = cur;
-  for (const x of allSites()) { const r = rank(x, st.day); if (better(r, bsr)) { bsr = r; bs = x; } }
+  // Compare like with like: only sites on the same horizon model (LOLA terrain or smooth Moon) as the chosen one.
+  const peers = allSites().filter((x) => useMask(x) === useMask(s));
+  const kind = !st.terrain ? 'site' : (useMask(s) ? 'site with LOLA terrain' : 'smooth-Moon site');
+  for (const x of peers) { const r = rank(x, st.day); if (better(r, bsr)) { bsr = r; bs = x; } }
 
   const slip = bd - st.day;
   const dayLine = br[0] < 0 ? line('No day within ±' + SLIP + ' days at ' + s.name + ' has Sun and Earth up at touchdown.')
     : bd === st.day ? line(date + ' is already the best day at ' + s.name + ' within ±' + SLIP + ' days.')
     : line('Best day at ' + s.name + ' within ±' + SLIP + ' days:', dLabel(Lidx(bd)) + ' (' + (slip > 0 ? '+' : '−') + Math.abs(slip) + ' d)', () => setDay(bd), '— ' + what(br));
-  const siteLine = bsr[0] < 0 ? line('No site has Sun and Earth up at touchdown on ' + date + '.')
-    : bs === s ? line(s.name + ' is already the best site on ' + date + '.')
-    : line('Best site on ' + date + ':', bs.name, () => set({ siteId: bs.id, t: 0 }), '— ' + what(bsr) + (st.terrain && !bs.mask_deg ? ' (smooth Moon, no terrain)' : ''));
+  const siteLine = bsr[0] < 0 ? line('No ' + kind + ' has Sun and Earth up at touchdown on ' + date + '.')
+    : bs === s ? line(s.name + ' is already the best ' + kind + ' on ' + date + '.')
+    : line('Best ' + kind + ' on ' + date + ':', bs.name, () => set({ siteId: bs.id, t: 0 }), '— ' + what(bsr));
   $('suggest').replaceChildren(dayLine, siteLine);
 }
 
