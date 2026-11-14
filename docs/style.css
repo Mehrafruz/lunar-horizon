@@ -99,8 +99,14 @@ button { cursor: pointer; }
 .data { display: flex; flex-wrap: wrap; gap: 18px; }
 .data .col { flex: 1 1 420px; display: flex; flex-direction: column; gap: 6px; }
 .data h2, .custom h2 { font-size: 18px; }
-.vtable { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 10px; font-size: 13px; }
-.vtable b { color: #A7B2C2; font-weight: 600; }
+.data .col { min-width: 0; }
+.data .col.wide { flex-basis: 100%; }
+.vt-scroll { overflow-x: auto; font-size: 13px; }
+.vt { border-collapse: collapse; min-width: 760px; width: 100%; font-variant-numeric: tabular-nums; }
+.vt th { text-align: left; color: #A7B2C2; font-weight: 600; padding: 4px 10px 4px 0; border-bottom: 1px solid #1E2633; white-space: nowrap; }
+.vt td { padding: 3px 10px 3px 0; white-space: nowrap; }
+.vt .ok { color: #6BC3B8; font-weight: 600; }
+.vt .bad { color: #FFB4A8; font-weight: 600; }
 .prose { font-size: 13px; line-height: 1.5; color: #C3CCD8; }
 .prose b { color: #E8ECF2; }
 

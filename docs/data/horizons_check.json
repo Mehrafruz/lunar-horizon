@@ -1,0 +1,260 @@
+{
+ "source": "JPL Horizons API (ssd.jpl.nasa.gov), apparent airless az/el, observer 0 m",
+ "checked": "2026-11-14 10:32 UTC",
+ "tolerance_deg": 0.02,
+ "allPass": true,
+ "rows": [
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2026-12-21 00:00",
+   "horizons": {
+    "sunAz": 7.448473,
+    "sunEl": 6.419323,
+    "earthAz": 324.154601,
+    "earthEl": 10.554851
+   },
+   "ours": {
+    "sunAz": 7.4542,
+    "sunEl": 6.4187,
+    "earthAz": 324.1549,
+    "earthEl": 10.5548
+   },
+   "maxAbsDiff": 0.0057,
+   "pass": true
+  },
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2027-03-10 06:00",
+   "horizons": {
+    "sunAz": 123.31679,
+    "sunEl": -3.607158,
+    "earthAz": 324.887261,
+    "earthEl": 9.261241
+   },
+   "ours": {
+    "sunAz": 123.322,
+    "sunEl": -3.6079,
+    "earthAz": 324.8871,
+    "earthEl": 9.2616
+   },
+   "maxAbsDiff": 0.0052,
+   "pass": true
+  },
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2027-06-01 12:00",
+   "horizons": {
+    "sunAz": 188.13971,
+    "sunEl": -6.531898,
+    "earthAz": 323.549413,
+    "earthEl": 10.255204
+   },
+   "ours": {
+    "sunAz": 188.1448,
+    "sunEl": -6.5316,
+    "earthAz": 323.5501,
+    "earthEl": 10.2551
+   },
+   "maxAbsDiff": 0.0051,
+   "pass": true
+  },
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2028-02-15 18:00",
+   "horizons": {
+    "sunAz": 267.994421,
+    "sunEl": -0.875636,
+    "earthAz": 338.29012,
+    "earthEl": -2.186506
+   },
+   "ours": {
+    "sunAz": 268.0,
+    "sunEl": -0.8755,
+    "earthAz": 338.2904,
+    "earthEl": -2.1864
+   },
+   "maxAbsDiff": 0.0056,
+   "pass": true
+  },
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2029-09-30 03:00",
+   "horizons": {
+    "sunAz": 243.248368,
+    "sunEl": -0.804894,
+    "earthAz": 324.507226,
+    "earthEl": 4.092836
+   },
+   "ours": {
+    "sunAz": 243.2543,
+    "sunEl": -0.8049,
+    "earthAz": 324.5078,
+    "earthEl": 4.0925
+   },
+   "maxAbsDiff": 0.0059,
+   "pass": true
+  },
+  {
+   "site": "A",
+   "lat": -84.8,
+   "lon": 29.2,
+   "label": "near IM-2 Athena",
+   "utc": "2030-12-01 00:00",
+   "horizons": {
+    "sunAz": 79.930368,
+    "sunEl": 0.865672,
+    "earthAz": 337.7767,
+    "earthEl": 11.283746
+   },
+   "ours": {
+    "sunAz": 79.9357,
+    "sunEl": 0.8653,
+    "earthAz": 337.7767,
+    "earthEl": 11.2836
+   },
+   "maxAbsDiff": 0.0053,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2026-12-21 00:00",
+   "horizons": {
+    "sunAz": 272.075032,
+    "sunEl": 1.308808,
+    "earthAz": 229.215245,
+    "earthEl": 5.50086
+   },
+   "ours": {
+    "sunAz": 272.0807,
+    "sunEl": 1.3084,
+    "earthAz": 229.2156,
+    "earthEl": 5.5008
+   },
+   "maxAbsDiff": 0.0057,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2027-03-10 06:00",
+   "horizons": {
+    "sunAz": 28.179803,
+    "sunEl": 0.367311,
+    "earthAz": 229.891451,
+    "earthEl": 4.182763
+   },
+   "ours": {
+    "sunAz": 28.1851,
+    "sunEl": 0.3669,
+    "earthAz": 229.8913,
+    "earthEl": 4.1831
+   },
+   "maxAbsDiff": 0.0053,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2027-06-01 12:00",
+   "horizons": {
+    "sunAz": 92.757841,
+    "sunEl": -1.444859,
+    "earthAz": 228.606539,
+    "earthEl": 5.223756
+   },
+   "ours": {
+    "sunAz": 92.7629,
+    "sunEl": -1.4447,
+    "earthAz": 228.6072,
+    "earthEl": 5.2236
+   },
+   "maxAbsDiff": 0.0051,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2028-02-15 18:00",
+   "horizons": {
+    "sunAz": 172.619701,
+    "sunEl": -1.939872,
+    "earthAz": 242.982189,
+    "earthEl": -7.587289
+   },
+   "ours": {
+    "sunAz": 172.6253,
+    "sunEl": -1.9402,
+    "earthAz": 242.9825,
+    "earthEl": -7.5872
+   },
+   "maxAbsDiff": 0.0056,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2029-09-30 03:00",
+   "horizons": {
+    "sunAz": 147.989752,
+    "sunEl": 0.467463,
+    "earthAz": 229.329493,
+    "earthEl": -0.966828
+   },
+   "ours": {
+    "sunAz": 147.9957,
+    "sunEl": 0.4669,
+    "earthAz": 229.3301,
+    "earthEl": -0.9671
+   },
+   "maxAbsDiff": 0.0059,
+   "pass": true
+  },
+  {
+   "site": "B",
+   "lat": -88.74,
+   "lon": 124.5,
+   "label": "most-illuminated point (Bussey 2010)",
+   "utc": "2030-12-01 00:00",
+   "horizons": {
+    "sunAz": 344.590365,
+    "sunEl": 1.168949,
+    "earthAz": 242.664663,
+    "earthEl": 5.88307
+   },
+   "ours": {
+    "sunAz": 344.5957,
+    "sunEl": 1.1691,
+    "earthAz": 242.6647,
+    "earthEl": 5.8829
+   },
+   "maxAbsDiff": 0.0053,
+   "pass": true
+  }
+ ]
+}

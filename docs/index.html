@@ -148,11 +148,11 @@
   </section>
 
   <section class="card data" aria-label="Data and verification">
-    <div class="col">
+    <div class="col wide">
       <h2>Check against JPL Horizons</h2>
-      <span class="sub">84.8°S 29.2°E, 21 Dec 2026 00:00 UTC, observer on the surface.</span>
-      <div class="vtable" id="vtable"></div>
-      <span class="hint">Horizons values come from a query made before the event; the team re-runs this check, and more dates, in the build.</span>
+      <span class="sub">Two points, six dates, observer on the surface. Each cell: Horizons value / this page, in degrees.</span>
+      <div class="vt-scroll" id="vtable">Loading…</div>
+      <span class="hint" id="vnote"></span>
     </div>
     <div class="col prose">
       <h2>Sources and tools</h2>

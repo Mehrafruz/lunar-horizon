@@ -1,7 +1,7 @@
 // Written with assistance from Claude Code (Anthropic).
 // Lunar Horizon — page logic, ported from reference/prototype-v2.dc.html.
 // All geometry comes from sky-core.js; this file only does state, caching and drawing.
-import { R_MOON, AU, SUN_R, frame, vec, azel, discFrac, dip, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
+import { SUN_R, discFrac, dip, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
 
 const H_OBS_M = 2;                     // panel/antenna height above the ground
 const DIP = dip(H_OBS_M / 1000);       // smooth-Moon horizon for that observer
@@ -10,8 +10,6 @@ const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 const RAMP = ['#1F3A5A', '#245E86', '#2E86A6', '#6BC3B8', '#F2E7A1'];
 const NOLAND = '#151A23', BEYOND = '#0B0E14';
 const ROW_H = 36, ROW_GAP = 4;         // calendar row height and gap (px), must match .site-btn
-// JPL Horizons reference: 84.8°S 29.2°E, 2026-12-21 00:00 UTC, observer on the surface (CLAUDE.md, step 2).
-const HZ = { lat: -84.8, lon: 29.2, date: Date.UTC(2026, 11, 21), sAz: 7.448, sEl: 6.419, eAz: 324.155, eEl: 10.555 };
 
 const $ = (id) => document.getElementById(id);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -301,14 +299,33 @@ function drawLane(cv, up, color) {
 }
 
 // ---------- verification against JPL Horizons ----------
-function renderVerification() {
-  const vi = Math.round((HZ.date - START) / (STEP_H * 3600000));
-  const F = frame(HZ.lat, HZ.lon), P = vec(HZ.lat, HZ.lon, R_MOON);
-  const sv = azel(F, P, vec(E.sLat[vi], E.sLon[vi], AU)), ev = azel(F, P, vec(E.eLat[vi], E.eLon[vi], E.eKm[vi]));
-  const df = (a, b) => { const x = a - b; return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(3) + '°'; };
-  const rows = [['Sun azimuth', HZ.sAz, sv[0]], ['Sun elevation', HZ.sEl, sv[1]], ['Earth azimuth', HZ.eAz, ev[0]], ['Earth elevation', HZ.eEl, ev[1]]];
-  $('vtable').innerHTML = '<b></b><b>Horizons</b><b>This page</b><b>Difference</b>' +
-    rows.map(([l, h, o]) => '<span>' + l + '</span><span>' + h.toFixed(3) + '°</span><span>' + o.toFixed(3) + '°</span><span>' + df(o, h) + '</span>').join('');
+// Horizons values come from data/horizons_check.json (written by pipeline/horizons_check.py);
+// "this page" is computed here with computeSite (observer 0 m, as in the query), so the table stays live.
+async function renderVerification() {
+  let hz;
+  try { hz = await getJSON('data/horizons_check.json'); }
+  catch (err) { $('vtable').textContent = 'Could not load ' + err.message + '.'; return; }
+  const wrap = (x) => ((x + 180) % 360 + 360) % 360 - 180;
+  const cache = new Map(), tol = hz.tolerance_deg;
+  let worst = 0, sunAzSum = 0, allOk = true;
+  const body = hz.rows.map((r) => {
+    const k = r.lat + ',' + r.lon;
+    if (!cache.has(k)) cache.set(k, computeSite(E, { lat: r.lat, lon: r.lon }, 0));
+    const S = cache.get(k), i = Math.round((Date.parse(r.utc.replace(' ', 'T') + ':00Z') - START) / (STEP_H * 3600000));
+    const o = [S.sAz[i], S.sEl[i], S.eAz[i], S.eEl[i]], h = r.horizons;
+    const hv = [h.sunAz, h.sunEl, h.earthAz, h.earthEl];
+    const d = o.map((x, j) => (j % 2 === 0 ? wrap(x - hv[j]) : x - hv[j]));
+    const m = Math.max(...d.map(Math.abs)), ok = m <= tol;
+    worst = Math.max(worst, m); sunAzSum += d[0]; allOk = allOk && ok;
+    return '<tr><td>' + r.site + '</td><td>' + r.utc + '</td>' + o.map((x, j) => '<td>' + hv[j].toFixed(3) + ' / ' + x.toFixed(3) + '</td>').join('') +
+      '<td>' + m.toFixed(4) + '</td><td class="' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'pass' : 'FAIL') + '</td></tr>';
+  });
+  $('vtable').innerHTML = '<table class="vt"><thead><tr><th>Site</th><th>UTC</th><th>Sun az</th><th>Sun el</th><th>Earth az</th><th>Earth el</th><th>max |Δ|</th><th></th></tr></thead><tbody>' + body.join('') + '</tbody></table>';
+  const sites = [...new Set(hz.rows.map((r) => r.site + ' = ' + Math.abs(r.lat) + '°' + (r.lat < 0 ? 'S ' : 'N ') + Math.abs(r.lon) + '°' + (r.lon >= 0 ? 'E' : 'W') + ' (' + r.label + ')'))];
+  const meanSun = sunAzSum / hz.rows.length;
+  $('vnote').textContent = (allOk ? 'All ' + hz.rows.length + ' checks within ' + tol + '°' : 'Some checks are outside ' + tol + '°') + '; largest difference ' + worst.toFixed(4) + '°. ' +
+    'Mean Sun-azimuth difference (this page − Horizons): ' + (meanSun >= 0 ? '+' : '−') + Math.abs(meanSun).toFixed(4) + '°, same sign at every point; cause not investigated. ' +
+    sites.join('; ') + '. Horizons answers fetched ' + hz.checked + ' by pipeline/horizons_check.py (raw files are in the repository).';
 }
 
 function renderAll() {
