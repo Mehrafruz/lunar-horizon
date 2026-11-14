@@ -1,7 +1,7 @@
 // Written with assistance from Claude Code (Anthropic).
 // Lunar Horizon — page logic, ported from reference/prototype-v2.dc.html.
 // All geometry comes from sky-core.js; this file only does state, caching and drawing.
-import { SUN_R, discFrac, dip, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
+import { SUN_R, discFrac, dip, maskAt, computeSite, scoreTable, landingScore, hoursToCrossing, longestRun } from './sky-core.js';
 
 const H_OBS_M = 2;                     // panel/antenna height above the ground
 const DIP = dip(H_OBS_M / 1000);       // smooth-Moon horizon for that observer
@@ -18,17 +18,23 @@ const pad2 = (n) => String(n).padStart(2, '0');
 let E, N, STEP_H, SPD, START;
 let SITES = [];
 const custom = [];
-const st = { siteId: 'im2', day: 30, ws: null, hourIdx: 0, dur: 14, thr: 2, trueScale: false, t: 0, hover: null };
+const st = { siteId: 'im2', day: 30, ws: null, hourIdx: 0, dur: 14, thr: 2, trueScale: false, terrain: true, t: 0, hover: null };
 let timer = null;
 
 // ---------- caches ----------
 const seriesCache = new Map(), tableCache = new Map();
-const siteKey = (s) => s.lat.toFixed(4) + ',' + s.lon.toFixed(4);
+// A site uses its LOLA horizon mask when the terrain toggle is on and sites.json has one (south of 75°S).
+const useMask = (s) => st.terrain && !!s.mask_deg;
+const siteKey = (s) => s.lat.toFixed(4) + ',' + s.lon.toFixed(4) + (useMask(s) ? '|lola' : '');
 function series(s) {
   const k = siteKey(s);
-  // Smooth Moon only until step 4: sites.json already carries LOLA masks, but the page does not use them yet.
-  if (!seriesCache.has(k)) seriesCache.set(k, computeSite(E, { lat: s.lat, lon: s.lon }, H_OBS_M));
+  if (!seriesCache.has(k)) seriesCache.set(k, computeSite(E, useMask(s) ? s : { lat: s.lat, lon: s.lon }, H_OBS_M));
   return seriesCache.get(k);
+}
+const rangeCache = new Map();
+function maskRange(s) {
+  if (!rangeCache.has(s.id)) rangeCache.set(s.id, s.mask_deg.reduce((r, v) => [Math.min(r[0], v), Math.max(r[1], v)], [Infinity, -Infinity]));
+  return rangeCache.get(s.id);
 }
 function table(s, thr) {
   const k = siteKey(s) + '|' + thr;
@@ -101,7 +107,9 @@ function ring(ctx, x, y, w, h, inset, color) {
 function renderControls() {
   const s = curSite(), L0 = Lidx(st.day);
   $('siteName').textContent = s.name;
-  $('siteCoords').textContent = Math.abs(s.lat).toFixed(2) + '°' + (s.lat < 0 ? 'S' : 'N') + ' · ' + Math.abs(s.lon).toFixed(2) + '°' + (s.lon >= 0 ? 'E' : 'W') + ' · ' + s.tag;
+  $('siteCoords').textContent = Math.abs(s.lat).toFixed(2) + '°' + (s.lat < 0 ? 'S' : 'N') + ' · ' + Math.abs(s.lon).toFixed(2) + '°' + (s.lon >= 0 ? 'E' : 'W') + ' · ' + s.tag + (useMask(s) ? ' · ground ' + Math.round(s.h0_m) + ' m' : '');
+  for (const b of $('hzOpts').children) b.setAttribute('aria-pressed', String((b.dataset.v === 'lola') === st.terrain));
+  $('badge').textContent = useMask(s) ? 'LOLA TERRAIN · 240 m' : (st.terrain ? 'SMOOTH MOON · NO TERRAIN DATA HERE' : 'SMOOTH MOON');
   $('landingDate').textContent = dLabel(L0);
   $('dayPrev').disabled = st.day <= 0; $('dayNext').disabled = st.day >= lastDay();
   $('hourSel').value = String(st.hourIdx);
@@ -118,7 +126,7 @@ function renderControls() {
 let calKey = '', ovKey = '';
 function renderCalendar(force) {
   const sites = allSites(), s = curSite();
-  const key = [st.ws, st.day, s.id, st.thr, st.hourIdx, st.dur, sites.length].join('|');
+  const key = [st.ws, st.day, s.id, st.thr, st.hourIdx, st.dur, sites.length, st.terrain].join('|');
   if (!force && key === calKey) return;
   calKey = key;
 
@@ -131,7 +139,7 @@ function renderCalendar(force) {
     const b = document.createElement('button');
     b.type = 'button'; b.tabIndex = -1; b.className = 'site-btn' + (x.id === s.id ? ' sel' : '');
     b.innerHTML = '<span class="n"></span><span class="t"></span>';
-    b.firstChild.textContent = x.name; b.lastChild.textContent = x.tag;
+    b.firstChild.textContent = x.name; b.lastChild.textContent = x.tag + (st.terrain && !x.mask_deg ? ' · smooth Moon' : '');
     b.addEventListener('click', () => set({ siteId: x.id, t: 0 }));
     return b;
   }));
@@ -170,7 +178,7 @@ function drawCalendar() {
 // Week overview for the selected site (best touchdown in each week), cached per site/scenario.
 let ovVals = [];
 function renderOverview(force) {
-  const s = curSite(), key = [s.id, st.thr, st.hourIdx, st.dur].join('|');
+  const s = curSite(), key = [s.id, st.thr, st.hourIdx, st.dur, st.terrain].join('|');
   if (force || key !== ovKey) {
     ovKey = key;
     const weeks = Math.floor((lastDay() + 1) / 7);
@@ -180,7 +188,7 @@ function renderOverview(force) {
     while (w < weeks) {
       const y0 = dateAt(w * 7 * SPD).getUTCFullYear(); let m = 0;
       while (w + m < weeks && dateAt((w + m) * 7 * SPD).getUTCFullYear() === y0) m++;
-      yt.push('<span style="left:' + (w / weeks * 100) + '%;width:' + (m / weeks * 100) + '%">' + (m >= 6 ? y0 : '') + '</span>');
+      yt.push('<span style="left:' + (w / weeks * 100) + '%;width:' + (m / weeks * 100) + '%">' + (m >= 10 ? y0 : '') + '</span>');
       w += m;
     }
     $('yearTicks').innerHTML = yt.join('');
@@ -224,8 +232,10 @@ function renderNow() {
     if (S.sEl[q] > -2) hi = Math.max(hi, S.sEl[q] + 0.6);
     if (S.eEl[q] > -2) hi = Math.max(hi, S.eEl[q] + S.eR[q] + 0.4);
   }
+  const mask = useMask(s) ? s.mask_deg : null;
+  if (mask) { const [mMin, mMax] = maskRange(s); lo = Math.min(lo, mMin - 0.5); hi = Math.max(hi, mMax + 0.5); }
   let vy, ex;
-  if (st.trueScale) { vy = pxDeg; ex = 1; lo = -2; } else { vy = Math.min(14 * pxDeg, 205 / (hi - lo)); ex = vy / pxDeg; }
+  if (st.trueScale) { vy = pxDeg; ex = 1; lo = Math.min(lo, -2); } else { vy = Math.min(14 * pxDeg, 205 / (hi - lo)); ex = vy / pxDeg; }
   const Y = (el) => 225 - (el - lo) * vy;
   const Xa = (az) => X0 + (wrapRel(az, centre) + 180) * pxDeg;
   // Mission paths, broken where they cross the ±180° seam of the panorama.
@@ -256,9 +266,17 @@ function renderNow() {
   const earth = 'cx="' + Xa(S.eAz[iNow]).toFixed(1) + '" cy="' + Math.max(4, Y(S.eEl[iNow])).toFixed(1) + '" rx="' + rx(S.eR[iNow]) + '" ry="' + ry(S.eR[iNow]) + '"';
   if (earthUp) svg.push('<ellipse ' + earth + ' fill="#6CB6FF" stroke="#D4EAFF" stroke-width="1.5"/>');
   if (sunUp) svg.push('<ellipse ' + sun + ' fill="#FFC24B" stroke="#FFE7B0" stroke-width="1.5"/>');
-  const groundY = Math.min(240, Y(DIP));
-  svg.push('<rect x="44" y="' + groundY.toFixed(1) + '" width="956" height="' + (250 - groundY).toFixed(1) + '" fill="#262E3C"/>');
-  svg.push('<line x1="44" x2="1000" y1="' + groundY.toFixed(1) + '" y2="' + groundY.toFixed(1) + '" stroke="#7A879C" stroke-width="1.5"/>');
+  if (mask) {
+    // Terrain skyline from the LOLA mask, every 0.5° across the panorama.
+    const pts = [];
+    for (let k = 0; k <= 720; k++) pts.push((X0 + k * 0.5 * pxDeg).toFixed(1) + ',' + Math.min(249, Y(maskAt(mask, centre - 180 + k * 0.5))).toFixed(1));
+    svg.push('<polygon points="44,250 ' + pts.join(' ') + ' 1000,250" fill="#262E3C"/>');
+    svg.push('<polyline points="' + pts.join(' ') + '" fill="none" stroke="#7A879C" stroke-width="1.5" stroke-linejoin="round"/>');
+  } else {
+    const groundY = Math.min(240, Y(DIP));
+    svg.push('<rect x="44" y="' + groundY.toFixed(1) + '" width="956" height="' + (250 - groundY).toFixed(1) + '" fill="#262E3C"/>');
+    svg.push('<line x1="44" x2="1000" y1="' + groundY.toFixed(1) + '" y2="' + groundY.toFixed(1) + '" stroke="#7A879C" stroke-width="1.5"/>');
+  }
   if (!earthUp) svg.push('<ellipse ' + earth + ' fill="none" stroke="#6CB6FF" stroke-width="1.5" stroke-dasharray="3 3"/>');
   if (!sunUp) svg.push('<ellipse ' + sun + ' fill="none" stroke="#FFC24B" stroke-width="1.5" stroke-dasharray="3 3"/>');
   const compass = [[0, s.lat > 0 && polar ? 'N · pole' : 'N'], [90, 'E'], [180, s.lat < 0 ? 'S · pole' : 'S'], [270, 'W']]
@@ -268,24 +286,27 @@ function renderNow() {
   for (const [x, l, fill] of compass) svg.push('<text x="' + x.toFixed(1) + '" y="244" fill="' + fill + '" font-size="13" font-weight="600" font-family="Inter" text-anchor="middle">' + l + '</text>');
   $('sky').innerHTML = svg.join('');
 
+  const ref = mask ? 'horizontal' : 'horizon';
+  const hzThere = (el, clr) => mask ? ' · terrain horizon there ' + fmtDeg(el - clr) : '';
   const when = (h) => h === null ? 'no change before Dec 2030 (end of data)' : 'in ≈ ' + fmtH(h);
   const sCross = hoursToCrossing(S.sClr, 0, iNow, STEP_H), eCross = hoursToCrossing(S.eClr, thr, iNow, STEP_H);
   const sunState = sClr >= 0 ? 'Up — sets ' + when(sCross) : 'Down — rises ' + when(sCross);
   const earthState = eClr >= thr ? 'Usable — drops below ' + thr + '° ' + when(eCross)
-    : (S.eEl[iNow] > DIP ? 'Too low (under ' + thr + '°) — usable ' + when(eCross) : 'Below the horizon — usable ' + when(eCross));
-  $('sky').setAttribute('aria-label', 'Sky at ' + s.name + ' on ' + dtLabel(iNow) + '. Sun ' + S.sEl[iNow].toFixed(1) + ' degrees above the horizon, ' + sunState + '. Earth ' + S.eEl[iNow].toFixed(1) + ' degrees, ' + earthState + '.');
+    : (eClr > 0 ? 'Too low (under ' + thr + '°) — usable ' + when(eCross) : 'Below the horizon — usable ' + when(eCross));
+  $('sky').setAttribute('aria-label', 'Sky at ' + s.name + ' on ' + dtLabel(iNow) + '. Sun ' + S.sEl[iNow].toFixed(1) + ' degrees above the ' + ref + ', ' + sunState + '. Earth ' + S.eEl[iNow].toFixed(1) + ' degrees, ' + earthState + '.');
   $('panoNote').textContent = (polar ? 'Centred on the direction to Earth. ' : 'Centred on ' + (s.lat < 0 ? 'south' : 'north') + '. ') +
     (st.trueScale ? 'True scale: 1° up is as tall as 1° across.' : (ex > 1.05 ? 'Height stretched ×' + ex.toFixed(1) + ' so low angles are visible.' : 'Height shown at about true scale.')) +
-    ' Sun and Earth are drawn at their real size. Dashed: their paths during the mission; a dashed outline means below the horizon.';
+    ' Sun and Earth are drawn at their real size. Dashed: their paths during the mission; a dashed outline means below the horizon.' +
+    (mask ? ' Grey: the terrain skyline from LOLA.' : '');
   $('nowLabel').textContent = dtLabel(iNow) + ' · mission day ' + (Math.floor(tt / SPD) + 1) + ' of ' + st.dur;
   $('tSlider').value = String(tt);
 
   $('sunEl').textContent = fmtDeg(S.sEl[iNow]);
-  $('sunAz').textContent = Math.round(S.sAz[iNow]) + '°';
+  $('sunSub').textContent = 'above the ' + ref + ' · azimuth ' + Math.round(S.sAz[iNow]) + '° (for panel pointing)' + hzThere(S.sEl[iNow], sClr);
   $('sunDisc').textContent = Math.round(discFrac(sClr, SUN_R) * 100) + '%';
   $('sunState').textContent = sunState;
   $('earthEl').textContent = fmtDeg(S.eEl[iNow]);
-  $('earthAz').textContent = Math.round(S.eAz[iNow]) + '°';
+  $('earthSub').textContent = 'above the ' + ref + ' · azimuth ' + Math.round(S.eAz[iNow]) + '°' + hzThere(S.eEl[iNow], eClr);
   $('earthState').textContent = earthState;
 
   drawLane($('laneSun'), (j) => S.sClr[j] >= 0, '#FFC24B');
@@ -345,6 +366,7 @@ function bind() {
   $('durInc').addEventListener('click', () => set({ dur: Math.min(30, st.dur + 1), t: 0 }));
   $('hourSel').addEventListener('change', (e) => set({ hourIdx: Number(e.target.value), t: 0 }));
   $('scaleBtn').addEventListener('click', () => set({ trueScale: !st.trueScale }));
+  for (const b of $('hzOpts').children) b.addEventListener('click', () => set({ terrain: b.dataset.v === 'lola' }));
   $('wsPrev').addEventListener('click', () => set({ ws: st.ws - 30 }));
   $('wsNext').addEventListener('click', () => set({ ws: st.ws + 30 }));
   $('tSlider').addEventListener('input', (e) => { st.t = Number(e.target.value); renderNow(); });

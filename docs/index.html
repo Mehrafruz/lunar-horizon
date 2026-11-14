@@ -21,7 +21,7 @@
       <p>Pick a landing site and a landing time. See when you will have sunlight for power and Earth in view for a direct link — and which day to choose if the launch slips.</p>
     </div>
     <div class="notice">
-      <b>Smooth-Moon preview.</b> Sun and Earth positions are real (JPL DE421 ephemeris, Nov 2026 – Dec 2030). Terrain is <b>not yet included</b>: real horizons from NASA LOLA elevation data come next, and they will change every number.
+      <b>Terrain from LOLA 240 m:</b> near-field ridges under ~500 m are not resolved; times can be off by several hours. Sun and Earth positions are from the JPL DE421 ephemeris (Nov 2026 – Dec 2030). Sites north of 75°S and points you add use a smooth Moon.
     </div>
   </header>
 
@@ -55,6 +55,13 @@
       <span class="lbl">Earth counts as usable above</span>
       <div class="stepper" id="thrOpts"></div>
     </div>
+    <div class="field">
+      <span class="lbl">Horizon</span>
+      <div class="stepper" id="hzOpts">
+        <button type="button" class="btn opt" data-v="lola" aria-pressed="true">LOLA terrain (240 m)</button>
+        <button type="button" class="btn opt" data-v="smooth" aria-pressed="false">Smooth Moon</button>
+      </div>
+    </div>
   </section>
 
   <p class="error" role="alert" id="error" hidden></p>
@@ -67,7 +74,7 @@
       </div>
       <div class="sky-wrap">
         <svg id="sky" viewBox="0 0 1000 250" role="img" aria-label="Loading"></svg>
-        <span class="badge">SMOOTH MOON · NO TERRAIN YET</span>
+        <span class="badge" id="badge"></span>
       </div>
       <p class="note" id="panoNote"></p>
       <div class="play-row">
@@ -88,14 +95,14 @@
       <div class="card ro">
         <span class="ro-kicker sun">SUN · POWER</span>
         <span class="big" id="sunEl">—</span>
-        <span class="sub">above the horizon · azimuth <span id="sunAz">—</span> (for panel pointing)</span>
+        <span class="sub" id="sunSub">—</span>
         <span class="sub"><span id="sunDisc">—</span> of the solar disc above the horizon</span>
         <span class="state" id="sunState"></span>
       </div>
       <div class="card ro">
         <span class="ro-kicker earth">EARTH · LINE OF SIGHT</span>
         <span class="big" id="earthEl">—</span>
-        <span class="sub">above the horizon · azimuth <span id="earthAz">—</span></span>
+        <span class="sub" id="earthSub">—</span>
         <span class="state" id="earthState"></span>
         <span class="hint">Line of sight only. Ground-station schedules and relay satellites are not modelled.</span>
       </div>
@@ -157,9 +164,10 @@
     <div class="col prose">
       <h2>Sources and tools</h2>
       <span><a href="https://ssd.jpl.nasa.gov/horizons/">JPL Horizons</a> — reference for Sun and Earth positions. <a href="https://quickmap.lroc.asu.edu/">LROC Quickmap</a> — maps and average illumination for any site. <a href="https://trek.nasa.gov/moon/">NASA Moon Trek</a> — 3D terrain. <a href="https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/">CSA Moon exploration</a> — Canada's lunar missions.</span>
+      <span>Terrain: <a href="https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/">NASA LRO LOLA polar elevation model</a> (LDEM_75S_240M). For each site south of 75°S we computed the skyline in 1440 directions, 2 m above the ground.</span>
       <span>What this page adds: a site × landing-date calendar that answers “the launch slipped — where and when now?” in one view.</span>
       <span>Sites: IM-1, IM-2, Chandrayaan-3, Apollo 11 from LROC landing-site images. Artemis regions are 15 × 15 km; NASA has not published centre points, so each point here is one we picked inside the region.</span>
-      <span><b>Use of AI:</b> this page, its calculation code and the ephemeris script were written with Claude (Anthropic) during the hackathon. Site coordinates were researched with AI help and checked against LROC. Design choices were reviewed with AI critiques.</span>
+      <span><b>Use of AI:</b> this page, its calculation code, the ephemeris script and the terrain script were written with Claude (Anthropic) during the hackathon. Site coordinates were researched with AI help and checked against LROC. Design choices were reviewed with AI critiques.</span>
     </div>
   </section>
 
@@ -172,12 +180,12 @@
         <div class="field"><label class="lbl" for="cLon">Longitude ° (east +)</label><input id="cLon" type="text" inputmode="decimal" class="inp" style="width:130px"></div>
         <button type="submit" class="btn-light">Add</button>
       </form>
-      <span class="hint" id="cMsg">Any point on the Moon, for example an Apollo site. It joins the calendar and the sky view.</span>
+      <span class="hint" id="cMsg">Any point on the Moon, for example an Apollo site. It joins the calendar and the sky view, on a smooth Moon (no terrain).</span>
     </section>
     <section class="card why" aria-label="Why it matters">
       <div><b>Why is the Sun so low?</b><span>The Moon's axis is tilted only 1.5°. At 84°S the Sun never rises more than about 8°, and closer to the pole even less. Press “True scale” to see how flat that is.</span></div>
       <div><b>Why does Earth move?</b><span>Earth stays in almost the same part of the sky, but the Moon's wobble (libration) swings it about 7° up, down and sideways every month. Near the pole that is enough to drop it below the horizon.</span></div>
-      <div><b>What is not modelled yet</b><span>Terrain (next step: horizons from NASA LOLA data), ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
+      <div><b>What is not modelled</b><span>Terrain finer than 240 m and terrain north of 75°S; ground-station schedules and relays. The Sun counts as up when its centre is above the horizon — then half of its disc is visible.</span></div>
     </section>
   </div>
 
