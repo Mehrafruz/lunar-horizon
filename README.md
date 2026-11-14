@@ -121,9 +121,9 @@ The Shackleton and hillshade tests need the downloaded elevation model and are s
 - **Terrain north of 75°S is not included.** Chandrayaan-3, Apollo 11 and points you add use a smooth Moon.
   The calendar marks those rows.
 - **3-hour time step.** Rise and set times between samples are interpolated.
-- **"Most-illuminated point".** Bussey et al. (2010) report about 86% sunlit for a point near this site. At the
-  coordinates we use (88.74°S 124.5°E) our LOLA masks give the Sun's centre above the horizon for 60% of
-  Nov 2026 – Dec 2030, and the label on the page says so. The highest pixel of the 240 m model within 3 km
+- **"Most-illuminated point".** The abstract of Bussey et al. (2010) gives 86% of the year lit for the point
+  88.74°S 124.5°E, near the rim of Shackleton crater. At those coordinates, which we use, our LOLA masks give
+  the Sun's centre above the horizon for 60% of Nov 2026 – Dec 2030, and the label on the page says so. The highest pixel of the 240 m model within 3 km
   (88.807°S 123.637°E, 2.1 km away) gives 86%. We did not move the point. The paper used Kaguya topography,
   not LOLA, so we do not claim agreement with it.
 - **Each site is one point, not a region.** Near ridges, a point a few hundred metres away can see a quite
@@ -164,7 +164,7 @@ Data:
 Papers:
 
 - Bussey, D. B. J., et al. (2010). Illumination conditions of the south pole of the Moon derived using Kaguya
-  topography. *Icarus* 208, 558.
+  topography. *Icarus* 208(2), 558–564. https://doi.org/10.1016/j.icarus.2010.03.028
 
 Libraries: `numpy`, `jplephem`, `de421` (pipeline only). Fonts: Inter and Space Grotesk (Google Fonts).
 The page uses one JavaScript library, three.js (MIT licence, https://threejs.org/, version 0.160.0 from
