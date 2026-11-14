@@ -449,6 +449,13 @@ async function renderVerification() {
 // ---------- 3-D terrain (three.js, loaded when the section first comes into view) ----------
 let view3d = null, want3d = false, starting3d = false, failed3d = false, site3d = null, loading3d = null;
 const patchCache = new Map();
+// Open the page with ?debug3d to see what the 3-D view got from the browser (for phones without a console).
+const DEBUG3D = /[?&]debug3d\b/.test(location.search), errors3d = [];
+if (DEBUG3D) {
+  const err = console.error.bind(console);
+  console.error = (...a) => { errors3d.push(a.map(String).join(' ').slice(0, 200)); err(...a); };
+  window.addEventListener('error', (e) => errors3d.push(String(e.message).slice(0, 200)));
+}
 function msg3d(text) { $('t3dMsg').textContent = text; $('t3dMsg').hidden = !text; }
 function render3d() {
   const s = curSite();
@@ -464,8 +471,12 @@ function render3d() {
 function start3d() {
   if (starting3d) return;
   starting3d = true; msg3d('Loading the 3-D view…');
-  import('./terrain3d.js').then((m) => { view3d = m.createTerrainView($('t3dCv')); render3d(); })
-    .catch(() => { failed3d = true; msg3d('The 3-D view could not start. It needs WebGL and the three.js library from cdn.jsdelivr.net.'); });
+  import('./terrain3d.js').then((m) => {
+    view3d = m.createTerrainView($('t3dCv'), () => { failed3d = true; msg3d('The browser stopped the 3-D view (WebGL context lost). Reload the page to try again.'); });
+    if (DEBUG3D) setInterval(() => { $('t3dDebug').textContent = view3d.info() + (errors3d.length ? ' · errors: ' + errors3d.join(' | ') : ''); }, 1000);
+    render3d();
+  })
+    .catch((e) => { failed3d = true; errors3d.push(String(e)); msg3d('The 3-D view could not start. It needs WebGL and the three.js library from cdn.jsdelivr.net.' + (DEBUG3D ? ' (' + e + ')' : '')); });
 }
 function loadPatch(s) {
   if (loading3d === s.id) return;

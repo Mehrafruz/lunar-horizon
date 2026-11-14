@@ -9,7 +9,8 @@ const D2R = Math.PI / 180;
 // Direction on the sky (azimuth from north clockwise, elevation) as a three.js unit vector.
 const skyDir = (az, el) => new THREE.Vector3(Math.cos(el * D2R) * Math.sin(az * D2R), Math.sin(el * D2R), -Math.cos(el * D2R) * Math.cos(az * D2R));
 
-export function createTerrainView(canvas) {
+// onLost(): called if the browser drops the WebGL context (it can on phones).
+export function createTerrainView(canvas, onLost) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true;
@@ -49,8 +50,13 @@ export function createTerrainView(canvas) {
   scene.add(sunArrow, earthArrow, sunBall, earthBall);
   const dim = (arrow, up) => { for (const m of [arrow.line.material, arrow.cone.material]) { m.transparent = true; m.opacity = up ? 1 : 0.35; } };
 
-  function render() { renderer.render(scene, camera); }
+  let renders = 0;
+  function render() { renderer.render(scene, camera); renders++; }
   controls.addEventListener('change', render);
+  // Redraw every frame while the view is on screen: some browsers (Safari on iPhone) can drop a frame that
+  // was drawn only once, which leaves the canvas empty. Off screen, nothing is drawn.
+  new IntersectionObserver((es) => renderer.setAnimationLoop(es.some((e) => e.isIntersecting) ? render : null)).observe(canvas);
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); renderer.setAnimationLoop(null); if (onLost) onLost(); });
 
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -98,5 +104,13 @@ export function createTerrainView(canvas) {
     render();
   }
 
-  return { setTerrain, setSky, resize };
+  // For ?debug3d: what the browser gave us.
+  function info() {
+    const gl = renderer.getContext();
+    return 'WebGL' + (renderer.capabilities.isWebGL2 ? '2' : '1') + ' · canvas ' + canvas.clientWidth + '×' + canvas.clientHeight +
+      ' css, buffer ' + gl.drawingBufferWidth + '×' + gl.drawingBufferHeight + ' · terrain ' + (mesh ? 'loaded' : 'none') +
+      ' · frames ' + renders + ' · lost ' + gl.isContextLost();
+  }
+
+  return { setTerrain, setSky, resize, info };
 }
