@@ -1,5 +1,22 @@
 # Lunar Horizon
 
+<div align="center">
+
+![NASA Space Apps 2026](https://img.shields.io/badge/NASA-Space_Apps_2026-0B3D91?style=for-the-badge)
+![Challenge](https://img.shields.io/badge/Challenge-Lunar_Landing_Site_Navigator-176B72?style=for-the-badge)
+
+[![Live page](https://img.shields.io/badge/Live_page-open-D5B77A?style=flat-square&labelColor=101A32)](https://mehrafruz.github.io/lunar-horizon/)
+[![Slides](https://img.shields.io/badge/Slides-7-A84D43?style=flat-square&labelColor=101A32)](https://mehrafruz.github.io/lunar-horizon/slides/)
+![HTML5](https://img.shields.io/badge/HTML5-no_build-E34F26?style=flat-square&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES_modules-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3_pipeline-3776AB?style=flat-square&logo=python&logoColor=white)
+![three.js](https://img.shields.io/badge/three.js-3D_view-000000?style=flat-square&logo=threedotjs&logoColor=white)
+![Data](https://img.shields.io/badge/Data-LRO_LOLA_%C2%B7_JPL_DE421-informational?style=flat-square)
+![JPL Horizons check](https://img.shields.io/badge/JPL_Horizons_check-12%2F12_within_0.006%C2%B0-brightgreen?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+
+</div>
+
 A web page for the NASA Space Apps Challenge 2026, challenge **Lunar Landing Site Navigator**.
 
 **Live page: https://mehrafruz.github.io/lunar-horizon/**
