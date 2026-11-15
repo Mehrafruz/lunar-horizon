@@ -1,5 +1,6 @@
 <!doctype html>
 <!-- Written with assistance from Claude Code (Anthropic). -->
+<!-- "From Khujand to the Moon": the story of two astronomers of our region frames the slides. The earlier plain version is docs/slides-draft/. -->
 <!-- Lunar Horizon — 7 slides for a live pitch. Arrow keys / click / swipe to move, N for speaker notes,
      F for full screen. Print (Ctrl/Cmd+P → Save as PDF, landscape) gives one slide per page. -->
 <html lang="en">
@@ -55,6 +56,44 @@ ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap:
 .step { display: inline-flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 10px 22px 10px 10px; }
 .step i { font-style: normal; width: 38px; height: 38px; border-radius: 50%; background: var(--ink); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; }
 .steps .arrow { color: var(--faint); font-size: 30px; }
+/* The thread: one line at the top of each slide that ties it to the two astronomers of slide 1. */
+.thread { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--sun-ink); }
+.dark .thread { color: #FFC24B; }
+.thread .em { width: 30px; height: 30px; flex: none; }
+.thread .th { font-size: 20px; font-weight: 500; color: var(--sun-ink); }
+.dark .thread .th { color: #FFD98A; }
+.thread .kicker::after { content: ' ·'; }
+.hero { position: absolute; left: 0; right: 0; bottom: 0; height: 470px; pointer-events: none; }
+.hero svg { display: block; width: 100%; height: 100%; }
+.hero-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 70px 88px 30px; background: linear-gradient(180deg, rgba(5,8,20,0) 0%, rgba(5,8,20,0.92) 55%); }
+.hero-line { font: 500 25px 'Space Grotesk', Inter, sans-serif; color: #E8E1D3; }
+.hero-line b { color: #D5B77A; font-weight: 700; }
+.thread .kicker.nodot::after { content: ''; }
+.medal { position: absolute; right: 130px; top: 120px; width: 215px; height: 215px; opacity: 0.3; filter: saturate(0.65); }
+.cmp { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 2px 4px rgba(20,26,38,0.06), 0 14px 36px rgba(20,26,38,0.18); }
+.four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 4px; }
+.four div { font-size: 21px; line-height: 1.38; color: var(--space-muted); }
+.four b { display: block; font: 700 23px 'Space Grotesk', Inter, sans-serif; color: #FFC24B; margin-bottom: 4px; }
+.hero7 { position: absolute; left: 0; right: 0; bottom: 0; width: 1600px; height: 310px; pointer-events: none; }
+.crop { overflow: hidden; border-radius: 14px; box-shadow: 0 2px 4px rgba(20,26,38,0.06), 0 14px 36px rgba(20,26,38,0.18); background: #fff; }
+.crop img { display: block; max-width: none; }
+.rahmat { font-size: 112px; letter-spacing: -2px; color: #FFC24B; line-height: 1; }
+.rubai-block { margin: 6px 0 0; padding: 14px 22px; border-left: 4px solid #FFC24B; background: rgba(232,225,211,0.05); border-radius: 0 8px 8px 0; font: 500 25px/1.45 'Space Grotesk', Inter, sans-serif; color: var(--space-ink); white-space: pre-line; max-width: 860px; }
+.dark .rubai-block { color: var(--space-ink); }
+.qrcard { background: #fff; border-radius: 20px; padding: 18px; }
+.qrcard img { display: block; width: 250px; height: 250px; image-rendering: pixelated; }
+.qrurl { font: 600 20px Inter, sans-serif; color: #9CCEFF; }
+.foot7 { position: absolute; left: 0; right: 0; bottom: 0; padding: 30px 88px 24px; background: linear-gradient(180deg, rgba(5,8,20,0) 0%, rgba(5,8,20,0.88) 60%); color: #E8E1D3; font-size: 19px; display: flex; justify-content: space-between; gap: 20px; }
+/* Ornamental edge, in the spirit of embroidered borders: a band along the top and bottom of every slide. */
+.slide::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2248%22%20height%3D%2218%22%20viewBox%3D%220%200%2048%2018%22%3E%3Cline%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%2248%22%20y2%3D%221%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cline%20x1%3D%220%22%20y1%3D%2217%22%20x2%3D%2248%22%20y2%3D%2217%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cpolygon%20points%3D%2224%2C2.5%2031%2C9%2024%2C15.5%2017%2C9%22%20fill%3D%22%23A84D43%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22/%3E%3Cpolygon%20points%3D%2224%2C5.5%2027.5%2C9%2024%2C12.5%2020.5%2C9%22%20fill%3D%22%23176B72%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%229%22%20r%3D%221.1%22%20fill%3D%22%23E8E1D3%22/%3E%3Ccircle%20cx%3D%220%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Cpath%20d%3D%22M7%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%20M35%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%22%20fill%3D%22none%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22%20opacity%3D%220.8%22/%3E%3C/svg%3E") repeat-x left top, url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2248%22%20height%3D%2218%22%20viewBox%3D%220%200%2048%2018%22%3E%3Cline%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%2248%22%20y2%3D%221%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cline%20x1%3D%220%22%20y1%3D%2217%22%20x2%3D%2248%22%20y2%3D%2217%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cpolygon%20points%3D%2224%2C2.5%2031%2C9%2024%2C15.5%2017%2C9%22%20fill%3D%22%23A84D43%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22/%3E%3Cpolygon%20points%3D%2224%2C5.5%2027.5%2C9%2024%2C12.5%2020.5%2C9%22%20fill%3D%22%23176B72%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%229%22%20r%3D%221.1%22%20fill%3D%22%23E8E1D3%22/%3E%3Ccircle%20cx%3D%220%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Cpath%20d%3D%22M7%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%20M35%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%22%20fill%3D%22none%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22%20opacity%3D%220.8%22/%3E%3C/svg%3E") repeat-x left bottom; }
+.slide.hero-slide::before, .slide.closing::before { background: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2248%22%20height%3D%2218%22%20viewBox%3D%220%200%2048%2018%22%3E%3Cline%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%2248%22%20y2%3D%221%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cline%20x1%3D%220%22%20y1%3D%2217%22%20x2%3D%2248%22%20y2%3D%2217%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%221.2%22%20opacity%3D%220.85%22/%3E%3Cpolygon%20points%3D%2224%2C2.5%2031%2C9%2024%2C15.5%2017%2C9%22%20fill%3D%22%23A84D43%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22/%3E%3Cpolygon%20points%3D%2224%2C5.5%2027.5%2C9%2024%2C12.5%2020.5%2C9%22%20fill%3D%22%23176B72%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%229%22%20r%3D%221.1%22%20fill%3D%22%23E8E1D3%22/%3E%3Ccircle%20cx%3D%220%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%229%22%20r%3D%221.7%22%20fill%3D%22%23D5B77A%22/%3E%3Cpath%20d%3D%22M7%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%20M35%2C9%20l3%2C-3%20l3%2C3%20l-3%2C3%20z%22%20fill%3D%22none%22%20stroke%3D%22%23D5B77A%22%20stroke-width%3D%220.9%22%20opacity%3D%220.8%22/%3E%3C/svg%3E") repeat-x left top; }
+.tl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: auto; }
+.tlp { margin: 0; border-radius: 16px; overflow: hidden; background: #111B31; border: 1px solid #24324F; }
+.tlp svg { display: block; width: 100%; height: auto; }
+.tlp figcaption { padding: 12px 16px 14px; font-size: 19px; line-height: 1.35; color: var(--space-muted); }
+.tlp figcaption b { color: #FFC24B; }
+.rubai { margin: 0; padding: 4px 0 4px 22px; border-left: 4px solid #FFC24B; font: 500 25px/1.5 'Space Grotesk', Inter, sans-serif; color: var(--space-ink); white-space: pre-line; }
 .pill { display: inline-block; padding: 8px 18px; border-radius: 999px; background: var(--ink); color: #fff; font: 600 22px Inter, sans-serif; }
 a { color: var(--earth-ink); } .dark a { color: #9CCEFF; }
 
@@ -77,43 +116,127 @@ a { color: var(--earth-ink); } .dark a { color: #9CCEFF; }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="sage" overflow="visible">
+      <path d="M-36,0 L-23,-112 Q0,-126 23,-112 L36,0 Z" fill="currentColor"/>
+      <path d="M-5,-118 L5,-118 L9,0 L-9,0 Z" fill="#000" opacity="0.14"/>
+      <rect x="-25" y="-74" width="50" height="8" rx="2" fill="#F2A900"/>
+      <path d="M10,-100 L50,-132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      <circle cx="52" cy="-134" r="7" fill="#D9A679"/>
+      <circle cx="0" cy="-131" r="15" fill="#D9A679"/>
+      <path d="M-12,-126 Q0,-98 12,-126 Q0,-118 -12,-126 Z" fill="var(--beard, #3A2E2A)"/>
+      <ellipse cx="0" cy="-145" rx="20" ry="11" fill="#F7F3EA"/>
+      <ellipse cx="2" cy="-152" rx="13" ry="7" fill="#EDE6D6"/>
+    </symbol></defs></svg>
 <div id="stage">
 
   <!-- 1 -->
-  <section class="slide dark" data-notes="Hi, we are Firdavs Khakimov and Mehrafruz Khakimova, team CastorLab. Can you trust the horizon on landing day? The main idea behind Lunar Horizon is simple: choosing a landing site is not enough — we also need to know when to land. Lunar Horizon is a public web page: choose a site and a touchdown time, and see when the lander has a clear view of the Sun and Earth — and what the best alternative is if the launch is delayed.">
+  <section class="slide dark hero-slide" data-notes="Salom! We are Firdavs Khakimov and Mehrafruz Khakimova, team CastorLab, from Tajikistan. A thousand years ago, an astronomer born in our country, al-Khujandi, measured how high the Sun stands above the horizon. A century later Omar Khayyam, poet and astronomer, helped build a solar calendar. Lunar Horizon asks both of their questions for the Moon: how high is the Sun over the real lunar mountains, and which day should we land? Choose a site and a touchdown time, and see when the lander has a clear view of the Sun and Earth — and the best alternative if the launch is delayed.">
     <span class="kicker">NASA Space Apps 2026 · Lunar Landing Site Navigator</span>
-    <h1>Lunar Horizon</h1>
+    <h1 style="font-size:88px">Lunar Horizon</h1>
     <p class="hook">“Can you trust the horizon on landing day?”</p>
-    <p style="font-size:28px; max-width:1260px">Choose a landing site and touchdown time. See when the lander has a clear view of the <b class="sun">Sun</b> and <b class="earth">Earth</b> — and find the best alternative if the launch is delayed.</p>
-    <svg class="band" viewBox="0 0 1600 330" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9AA3B3"/><stop offset="1" stop-color="#3E4656"/></linearGradient>
-        <radialGradient id="s1"><stop offset="0" stop-color="#FFE6A8" stop-opacity="0.9"/><stop offset="0.3" stop-color="#FFC24B" stop-opacity="0.35"/><stop offset="1" stop-color="#FFC24B" stop-opacity="0"/></radialGradient>
-        <radialGradient id="e1"><stop offset="0.6" stop-color="#7CC0FF" stop-opacity="0.5"/><stop offset="1" stop-color="#7CC0FF" stop-opacity="0"/></radialGradient>
-      </defs>
-      <circle cx="1210" cy="190" r="120" fill="url(#s1)"/><circle cx="1210" cy="190" r="22" fill="#FFF3D1"/>
-      <circle cx="430" cy="90" r="78" fill="url(#e1)"/><circle cx="430" cy="90" r="48" fill="#13233F"/>
-      <path d="M430,42 A48,48 0 0 1 430,138 A20,48 0 0 0 430,42 Z" fill="#8CC8FF"/>
-      <path d="M0,330 L0,232 C80,214 150,240 230,226 C330,208 380,250 470,246 C560,242 600,212 700,222 C800,232 860,262 960,256 C1060,250 1100,214 1190,206 C1270,198 1330,224 1420,214 C1500,206 1560,222 1600,218 L1600,330 Z" fill="url(#g1)"/>
-      <path d="M0,232 C80,214 150,240 230,226 C330,208 380,250 470,246 C560,242 600,212 700,222 C800,232 860,262 960,256 C1060,250 1100,214 1190,206 C1270,198 1330,224 1420,214 C1500,206 1560,222 1600,218" fill="none" stroke="#E4E8EF" stroke-width="2.5"/>
-    </svg>
+    <p style="font-size:26px; max-width:1020px">Choose a landing site and touchdown time. See when the lander has a clear view of the <b class="sun">Sun</b> and <b class="earth">Earth</b> — and find the best alternative if the launch is delayed.</p>
+    <svg class="medal" viewBox="-116 -116 232 232" aria-hidden="true"><g stroke="#D5B77A" stroke-width="2"><rect x="-78" y="-78" width="156" height="156" fill="#A84D43"/><rect x="-78" y="-78" width="156" height="156" fill="#A84D43" transform="rotate(45)"/></g><g fill="#176B72" stroke="#D5B77A" stroke-width="1.5"><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(0)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(45)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(90)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(135)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(180)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(225)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(270)"/><ellipse cx="0" cy="-46" rx="15" ry="30" transform="rotate(315)"/></g><circle r="30" fill="#E8E1D3" stroke="#D5B77A" stroke-width="2"/><g fill="#A84D43"><rect x="-14" y="-14" width="28" height="28"/><rect x="-14" y="-14" width="28" height="28" transform="rotate(45)"/></g><circle r="7" fill="#D5B77A"/><g fill="#E8E1D3"><circle cx="0" cy="-88" r="4" transform="rotate(11.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(33.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(56.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(78.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(101.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(123.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(146.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(168.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(191.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(213.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(236.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(258.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(281.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(303.75)"/><circle cx="0" cy="-88" r="4" transform="rotate(326.25)"/><circle cx="0" cy="-88" r="4" transform="rotate(348.75)"/></g></svg>
+    <div class="hero" aria-hidden="true">
+      <svg class="" viewBox="0 0 1600 470" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BCC0C7"/><stop offset="1" stop-color="#5F6570"/></linearGradient>
+          <radialGradient id="hs"><stop offset="0" stop-color="#FFE6A8" stop-opacity="0.85"/><stop offset="0.35" stop-color="#F0B44C" stop-opacity="0.3"/><stop offset="1" stop-color="#F0B44C" stop-opacity="0"/></radialGradient>
+          <radialGradient id="he"><stop offset="0.6" stop-color="#7CC0FF" stop-opacity="0.45"/><stop offset="1" stop-color="#7CC0FF" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g transform="translate(0,208)">
+        <!-- astronomical graticule around the Sun, like an engraved instrument -->
+        <g fill="none" stroke="#D5B77A">
+          <circle cx="1290" cy="150" r="82" stroke-opacity="0.5" stroke-dasharray="2 7"/>
+          <circle cx="1290" cy="150" r="128" stroke-opacity="0.35"/>
+          <circle cx="1290" cy="150" r="172" stroke-opacity="0.22" stroke-dasharray="1 9"/>
+          <path d="M1100,150 H1480 M1290,0 V320" stroke-opacity="0.3"/>
+          <path d="M1162,150 h8 M1410,150 h8 M1290,22 v8 M1290,270 v8" stroke-opacity="0.7" stroke-width="2"/>
+        </g>
+        <circle cx="1290" cy="150" r="110" fill="url(#hs)"/>
+        <circle cx="1290" cy="150" r="38" fill="#F0B44C" stroke="#D5B77A" stroke-width="2"/>
+        <circle cx="1290" cy="150" r="24" fill="#FFD98A"/>
+        </g>
+        <!-- Earth seen from the Moon, lit from the Sun's side -->
+        <circle cx="980" cy="112" r="50" fill="url(#he)"/>
+        <circle cx="980" cy="112" r="26" fill="#13233F" stroke="#D4EAFF" stroke-opacity="0.6"/>
+        <path d="M980,86 A26,26 0 0 1 980,138 A11,26 0 0 0 980,86 Z" fill="#8CC8FF"/>
+        <path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(760,88) scale(1.1)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.8" transform="translate(620,140) scale(0.7)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(1110,70) scale(0.8)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.8" transform="translate(1500,300) scale(0.7)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.7" transform="translate(860,200) scale(0.6)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(330,70) scale(0.9)"/>
+        <!-- the Pamir and an observatory: where the questions began -->
+        <g transform="translate(40,120)"><path d="M0,0 C14,-16 40,-16 48,-2 C54,10 42,18 34,11 C28,6 33,-2 39,1" fill="none" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/><path d="M48,-2 H150" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/></g><g transform="translate(570,222) scale(0.95)"><path d="M0,0 C14,-16 40,-16 48,-2 C54,10 42,18 34,11 C28,6 33,-2 39,1" fill="none" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/><path d="M48,-2 H150" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/></g>
+        <path d="M0,360 L0,250 L70,190 L120,226 L200,140 L262,206 L330,170 L400,232 L470,200 L560,290 L600,360 Z" fill="#2A3756"/>
+        <path d="M0,360 L0,286 L90,226 L150,262 L238,178 L320,262 L380,236 L470,300 L540,360 Z" fill="#3B4A6B"/>
+        <g fill="#E8E1D3"><path d="M200,140 L226,168 L212,166 L200,178 L188,164 L176,168 Z"/><path d="M238,178 L262,202 L248,200 L238,212 L226,198 L216,202 Z"/><path d="M330,170 L352,192 L338,190 L330,200 L320,190 L308,192 Z"/><path d="M70,190 L88,206 L78,206 L70,214 L60,206 L52,208 Z"/></g>
+        <path d="M0,470 V352 C120,338 260,346 400,342 C470,340 520,348 570,358 C620,366 680,374 760,376 V470 Z" fill="#203238"/>
+        <g transform="translate(150,352)">
+          <rect x="0" y="-62" width="240" height="62" fill="#C8A06A" stroke="#8A6A3E" stroke-width="2"/>
+          <rect x="96" y="-94" width="48" height="94" fill="#C8A06A" stroke="#8A6A3E" stroke-width="2"/>
+          <path d="M92,-94 A28,28 0 0 1 148,-94 Z" fill="#D9B47E" stroke="#8A6A3E" stroke-width="2"/>
+          <path d="M24,-62 A16,16 0 0 1 56,-62 Z M184,-62 A16,16 0 0 1 216,-62 Z" fill="#D9B47E" stroke="#8A6A3E" stroke-width="2"/>
+          <g fill="#5C4326"><path d="M16,0 V-30 A9,9 0 0 1 34,-30 V0 Z"/><path d="M50,0 V-30 A9,9 0 0 1 68,-30 V0 Z"/><path d="M108,0 V-48 A12,12 0 0 1 132,-48 V0 Z"/><path d="M172,0 V-30 A9,9 0 0 1 190,-30 V0 Z"/><path d="M206,0 V-30 A9,9 0 0 1 224,-30 V0 Z"/></g>
+        </g>
+        <g fill="#1E4A4A"><ellipse cx="118" cy="318" rx="9" ry="42"/><ellipse cx="136" cy="326" rx="7" ry="32"/><ellipse cx="418" cy="320" rx="9" ry="40"/><ellipse cx="438" cy="328" rx="7" ry="30"/></g>
+        <!-- the Moon: grey regolith and a lander with a suzani panel -->
+        <path d="M330,470 C400,458 462,404 560,374 C680,342 820,346 980,352 C1140,358 1300,372 1430,346 C1500,334 1560,330 1600,332 V470 Z" fill="url(#hl)"/>
+        <path d="M330,470 C400,458 462,404 560,374 C680,342 820,346 980,352 C1140,358 1300,372 1430,346 C1500,334 1560,330 1600,332" fill="none" stroke="#E8E1D3" stroke-width="2.5"/>
+        <g fill="#7C818B" opacity="0.55"><ellipse cx="700" cy="410" rx="34" ry="8"/><ellipse cx="1140" cy="410" rx="46" ry="10"/><ellipse cx="1340" cy="392" rx="22" ry="5"/><ellipse cx="880" cy="440" rx="28" ry="6"/></g>
+        <g transform="translate(960,352)">
+          <path d="M-46,-38 L-82,0 M46,-38 L82,0 M-30,-38 L-50,0 M30,-38 L50,0" stroke="#B58E55" stroke-width="5" stroke-linecap="round"/>
+          <ellipse cx="-82" cy="1" rx="12" ry="4" fill="#B58E55"/><ellipse cx="82" cy="1" rx="12" ry="4" fill="#B58E55"/>
+          <path d="M-58,-38 L58,-38 L50,-96 L-50,-96 Z" fill="#C9A85C" stroke="#141A26" stroke-width="2"/>
+          <rect x="-24" y="-88" width="48" height="42" fill="#E8E1D3" stroke="#141A26" stroke-width="2"/>
+          <g transform="translate(0,-67)"><rect x="-12" y="-12" width="24" height="24" fill="#A84D43" transform="rotate(45)"/><rect x="-6" y="-6" width="12" height="12" fill="#176B72" transform="rotate(45)"/><circle r="3" fill="#D5B77A"/></g>
+          <path d="M-40,-96 L40,-96 L32,-142 L-32,-142 Z" fill="#DCDDE0" stroke="#141A26" stroke-width="2"/>
+          <rect x="-16" y="-130" width="32" height="18" rx="2" fill="#13233F" stroke="#141A26" stroke-width="1.5"/>
+          <path d="M0,-142 L-6,-168" stroke="#141A26" stroke-width="2.5"/>
+          <ellipse cx="-12" cy="-176" rx="18" ry="8" fill="#E8E1D3" stroke="#141A26" stroke-width="2" transform="rotate(-28 -12 -176)"/>
+        </g>
+</svg>
+      <div class="hero-cap"><div class="hero-line"><b>From Khujand to the Moon</b> — a thousand years of asking how high the Sun stands.</div></div>
+    </div>
   </section>
 
   <!-- 2 -->
-  <section class="slide" data-notes="At the lunar south pole the Sun stays very low. At 84 degrees south it never rises more than about 8 degrees, so a nearby ridge can block sunlight for hours or even days. The same terrain can block the view of Earth: Earth stays in roughly the same part of the sky, but libration shifts it by about 7 degrees. A lander needs sunlight for power and a clear line of sight to Earth for direct communication — ideally both from touchdown. Here is a real example from our page: the IM-2 site on 15 December 2026 at midnight UTC — the Sun is just behind a ridge at touchdown, so zero hours with both. Land one day later: 13 days 15 hours without a break.">
-    <span class="kicker">The problem</span>
+  <section class="slide" data-notes="In June 994, al-Khujandi measured the noon Sun almost 78 degrees above the horizon. At the lunar south pole the Sun stays very low. At 84 degrees south it never rises more than about 8 degrees, so a nearby ridge can block sunlight for hours or even days. The same terrain can block the view of Earth: Earth stays in roughly the same part of the sky, but libration shifts it by about 7 degrees. A lander needs sunlight for power and a clear line of sight to Earth for direct communication — ideally both from touchdown. Here is a real example from our page: the IM-2 site on 15 December 2026 at midnight UTC — the Sun is just behind a ridge at touchdown, so zero hours with both. Land one day later: 13 days 15 hours without a break.">
+    <div class="thread"><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><path d="M4,10 A20,20 0 0 0 20,25" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24,3 L10,19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="3" r="2.5" fill="currentColor"/></svg><span class="kicker nodot">The problem</span></div>
     <h2>At the lunar south pole, even a small change in timing can change a mission</h2>
     <div class="row">
-      <div class="col" style="gap:18px">
-        <ul style="font-size:26px">
-          <li>At 84°S, the Sun never rises more than about <b>8°</b> above the horizon.</li>
-          <li>Nearby ridges can block sunlight for <b>hours or even days</b>.</li>
-          <li>Earth stays in roughly the same part of the sky, but lunar libration shifts it by about <b>7°</b> — enough to disappear behind the terrain.</li>
+      <div class="col" style="gap:16px; flex:1.15">
+        <svg class="cmp" viewBox="0 0 640 210" role="img" aria-label="Left: at Rayy in June 994 the noon Sun stood about 78 degrees above the horizon. Right: at 84 degrees south on the Moon the Sun never rises above about 8 degrees, and a ridge can hide it.">
+        <rect width="640" height="210" fill="#0B1222"/>
+        <g font-family="Inter, system-ui, sans-serif">
+          <g>
+            <text x="22" y="30" fill="#E6EBF5" font-size="17" font-weight="700" letter-spacing="1">RAYY · JUNE 994</text>
+            <rect x="0" y="160" width="320" height="50" fill="#4A3526"/><line x1="0" y1="160" x2="320" y2="160" stroke="#C9A26B" stroke-width="2"/>
+            <line x1="50" y1="160" x2="73" y2="52" stroke="#FFC24B" stroke-width="2" stroke-dasharray="4 5"/>
+            <circle cx="73" cy="52" r="26" fill="#FFC24B" opacity="0.16"/><circle cx="73" cy="52" r="12" fill="#FFD98A" stroke="#FFC24B" stroke-width="2"/>
+            <path d="M90,160 A40,40 0 0 0 58.3,120.9" fill="none" stroke="#E6EBF5" stroke-width="2"/>
+            <circle cx="50" cy="160" r="4" fill="#E6EBF5"/>
+            <text x="130" y="108" fill="#FFC24B" font-size="42" font-weight="700" font-family="'Space Grotesk', Inter, sans-serif">≈ 78°</text>
+            <text x="22" y="190" fill="#F1E3C8" font-size="16" font-weight="600">al-Khujandi's noon Sun</text>
+          </g>
+          <line x1="320" y1="14" x2="320" y2="196" stroke="#24324F" stroke-width="2"/>
+          <g transform="translate(320,0)">
+            <text x="22" y="30" fill="#E6EBF5" font-size="17" font-weight="700" letter-spacing="1">THE MOON · 84°S</text>
+            <path d="M0,160 L60,156 L105,148 L130,134 L160,148 L215,156 L320,160 L320,210 L0,210 Z" fill="#6B7180"/>
+            <path d="M0,160 L60,156 L105,148 L130,134 L160,148 L215,156 L320,160" fill="none" stroke="#E4E8EF" stroke-width="2"/>
+            <line x1="50" y1="160" x2="126" y2="137" stroke="#FFC24B" stroke-width="2" stroke-dasharray="4 5"/>
+            <line x1="126" y1="137" x2="238" y2="134" stroke="#FFC24B" stroke-width="1.5" stroke-dasharray="2 6" opacity="0.45"/>
+            <circle cx="238" cy="134" r="12" fill="none" stroke="#FFC24B" stroke-width="2" stroke-dasharray="3 3"/>
+            <path d="M90,160 A40,40 0 0 0 89.6,154.4" fill="none" stroke="#E6EBF5" stroke-width="2"/>
+            <circle cx="50" cy="160" r="4" fill="#E6EBF5"/>
+            <text x="130" y="92" fill="#FFC24B" font-size="42" font-weight="700" font-family="'Space Grotesk', Inter, sans-serif">≤ 8°</text>
+            <text x="22" y="190" fill="#F4F6FA" font-size="15" font-weight="600">Sun at its highest, behind a ridge</text>
+          </g>
+        </g>
+      </svg>
+        <ul style="font-size:25px; gap:8px">
+          <li>Ridges can block the Sun for <b>hours or even days</b>.</li>
+          <li>Libration moves Earth by about <b>7°</b> — it can drop behind the terrain.</li>
         </ul>
-        <p style="font-size:24px">A lander needs <b class="sun">sunlight</b> for power and a clear line of sight to <b class="earth">Earth</b> for direct communication. Ideally, both from touchdown.</p>
+        <p style="font-size:23px">A lander needs <b class="sun">sunlight</b> for power and <b class="earth">Earth</b> in view for a direct link. Ideally both, from touchdown.</p>
       </div>
       <div class="col" style="flex:0.85">
-        <div class="card sun-edge"><span class="cap">IM-2 site · 15 Dec 2026, 00:00 UTC · 14-day mission</span><div class="num">0 h</div><span class="cap">continuous Sun + Earth from touchdown — the Sun is behind a ridge and rises ≈ 4 h later</span></div>
+        <div class="card sun-edge"><span class="cap">IM-2 · 15 Dec 2026, 00:00 UTC · 14 days</span><div class="num">0 h</div><span class="cap">continuous Sun + Earth from touchdown — the Sun is behind a ridge and rises ≈ 4 h later</span></div>
         <div class="card earth-edge"><span class="cap">Same site · one day later, 16 Dec 2026</span><div class="num">13 d 15 h</div><span class="cap">continuous Sun + Earth from touchdown · 97% of the mission in total</span></div>
       </div>
     </div>
@@ -121,64 +244,59 @@ a { color: var(--earth-ink); } .dark a { color: #9CCEFF; }
   </section>
 
   <!-- 3 -->
-  <section class="slide" data-notes="So we built a tool that combines lunar terrain data with the positions of the Sun and Earth. It takes three steps: choose a site, set the landing date and time, explore the sky. The sky view shows the real terrain horizon from NASA's LOLA data, the Sun and Earth at their apparent angular sizes, and Earth's phase. The cards give azimuth and elevation, and the time until the next rise or set. Press play to watch the whole mission, from 1 to 30 days.">
-    <span class="kicker">What it does</span>
+  <section class="slide" data-notes="This is al-Khujandi's question, asked on the Moon: how high is the Sun? So we built a tool that combines lunar terrain data with the positions of the Sun and Earth. It takes three steps: choose a site, set the landing date and time, explore the sky. The sky view shows the real terrain horizon from NASA's LOLA data, the Sun and Earth at their apparent angular sizes, and Earth's phase. The cards give azimuth and elevation, and the time until the next rise or set. Press play to watch the whole mission, from 1 to 30 days.">
+    <div class="thread"><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><path d="M4,10 A20,20 0 0 0 20,25" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24,3 L10,19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="3" r="2.5" fill="currentColor"/></svg><span class="kicker">What it does</span><span class="th">Al-Khujandi’s question, asked on the Moon: how high is the Sun?</span></div>
     <h2 style="font-size:50px">See the Sun and Earth from any landing site, hour by hour</h2>
-    <div class="steps"><span class="step"><i>1</i>Choose a site</span><span class="arrow">→</span><span class="step"><i>2</i>Set the landing date and time</span><span class="arrow">→</span><span class="step"><i>3</i>Explore the sky</span></div>
-    <div class="row" style="align-items:center">
-      <div class="col" style="flex:2.1; align-items:center; justify-content:center"><img class="shot" src="img/sky.jpg" alt="Sky view at the IM-2 site on 16 Dec 2026 with the LOLA skyline, the Sun and Earth, and the Sun and Earth readout cards."></div>
-      <div class="col" style="flex:1; justify-content:center">
-        <ul style="font-size:25px; gap:12px">
-          <li>Real terrain horizon from <b>NASA LRO LOLA</b> data</li>
-          <li><b class="sun">Sun</b> and <b class="earth">Earth</b> at their apparent angular sizes</li>
-          <li>Earth's illuminated phase</li>
-          <li>Azimuth and elevation of the Sun and Earth</li>
-          <li>Time until the next rise or set</li>
-          <li>Full mission timeline, 1 to 30 days</li>
+    <div class="row" style="align-items:center; gap:36px">
+      <div class="col" style="flex:0 0 330px; gap:28px">
+        <div class="steps" style="flex-direction:column; align-items:flex-start; gap:14px">
+          <span class="step"><i>1</i>Choose a site</span>
+          <span class="step"><i>2</i>Set date and time</span>
+          <span class="step"><i>3</i>Explore the sky</span>
+        </div>
+        <ul style="font-size:24px; gap:10px">
+          <li>Real LOLA terrain horizon</li>
+          <li><b class="sun">Sun</b> and <b class="earth">Earth</b> at true size</li>
+          <li>Earth’s phase</li>
         </ul>
       </div>
+      <div class="col" style="flex:1; align-items:flex-end"><img class="shot" src="img/sky.jpg" style="width:1010px" alt="Sky view at the IM-2 site on 16 Dec 2026: the LOLA terrain skyline, the Sun and Earth, their paths over the mission and the mission timeline."></div>
     </div>
     <div class="foot"><span>The Sun counts as up when the centre of its disc is above the terrain horizon; the page also shows how much of the disc is visible.</span><span>3 / 7</span></div>
   </section>
 
   <!-- 4 -->
-  <section class="slide" data-notes="But we wanted to solve one more problem: what happens if the launch is delayed? Each row is a site, each column a landing day. Brighter means a longer continuous time with both the Sun and Earth above the terrain horizon from touchdown. The page also answers directly: the best day at this site within two weeks — 16 December, one day later, 13 days 15 hours. Or the best site on the same day — Nobile Rim 2, 11 days 9 hours. Best here means one criterion: the longest continuous Sun and Earth visibility — not a full landing-safety assessment.">
-    <span class="kicker">If the launch is delayed</span>
+  <section class="slide" data-notes="And this is Khayyam's question: which day? What happens if the launch is delayed? Each row is a site, each column a landing day. Brighter means a longer continuous time with both the Sun and Earth above the terrain horizon from touchdown. The page also answers directly: the best day at this site within two weeks — 16 December, one day later, 13 days 15 hours. Or the best site on the same day — Nobile Rim 2, 11 days 9 hours. Best here means one criterion: the longest continuous Sun and Earth visibility — not a full landing-safety assessment.">
+    <div class="thread"><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="22" height="22" rx="2"/><path d="M3,10.3 H25 M3,17.6 H25 M10.3,3 V25 M17.6,3 V25"/></g><rect x="11.3" y="11.3" width="5.3" height="5.3" fill="currentColor"/></svg><span class="kicker">If the launch is delayed</span><span class="th">Khayyam’s question, asked on the Moon: which day?</span></div>
     <h2>Find the best site and landing day in one view</h2>
-    <div class="row">
-      <div class="col" style="flex:2.1; align-items:center; justify-content:center"><img class="shot" src="img/calendar.jpg" alt="Delay calendar: nine sites by 90 landing days, with the suggestions Best day 16 Dec 2026 (+1 d) and Best site Nobile Rim 2."></div>
-      <div class="col" style="flex:1; justify-content:center; gap:16px">
-        <ul style="font-size:24px; gap:8px">
-          <li>Best landing day for the selected site, within ±14 days</li>
-          <li>Best landing site for the selected day</li>
-          <li>Week-by-week view to December 2030</li>
-        </ul>
-        <div class="card" style="padding:18px 22px"><span class="cap">IM-2 · best day: 16 Dec (+1 d)</span><div class="num" style="font-size:44px">13 d 15 h</div><span class="cap">continuous · 97% in total</span></div>
-        <div class="card" style="padding:18px 22px"><span class="cap">15 Dec · best site: Nobile Rim 2</span><div class="num" style="font-size:44px">11 d 9 h</div><span class="cap">continuous · 81% in total</span></div>
+    <div class="row" style="gap:40px; align-items:center">
+      <div class="col" style="flex:0 0 970px"><div class="crop" style="width:970px; height:430px"><img src="img/calendar.jpg" style="width:1030px; margin:-100px 0 0 -26px" alt="Delay calendar: sites in rows, landing days in columns, coloured by unbroken Sun and Earth time from touchdown."></div></div>
+      <div class="col" style="flex:1; gap:16px">
+        <div class="card" style="padding:20px 24px"><span class="cap">Best day for IM-2 · within ±14 days</span><div class="num" style="font-size:46px; margin:4px 0">16 Dec <span style="font-size:28px">(+1 d)</span></div><span class="cap">13 d 15 h unbroken · 97% in total</span></div>
+        <div class="card" style="padding:20px 24px"><span class="cap">Best site for 15 Dec</span><div class="num" style="font-size:42px; margin:4px 0">Nobile Rim 2</div><span class="cap">11 d 9 h unbroken · 81% in total</span></div>
+        <p style="font-size:21px">Plus a week-by-week view to December 2030.</p>
       </div>
     </div>
     <div class="foot"><span><b>Continuous</b> = both the Sun (centre) and Earth (2° or more) above the terrain horizon. <b>Best</b> = longest continuous time from touchdown, not a full landing-safety rating.</span><span>4 / 7</span></div>
   </section>
 
   <!-- 5 -->
-  <section class="slide dark" data-notes="How did we build it? Four parts. First, the positions of the Sun and Earth come from JPL's DE421 ephemeris, every three hours from November 2026 to December 2030. Second, terrain: from the LOLA elevation model at 240 metres we computed the local horizon in 1,440 directions for seven polar sites, including the Moon's curvature. Third, a 3D view: 38 by 38 kilometres around the site, with sunlight and shadows at the chosen time. It is an illustration — the visibility numbers use the full horizon, out to the edge of the map. Fourth, a Python pipeline with tests, and a page in plain HTML and JavaScript.">
-    <span class="kicker">Data and method</span>
+  <section class="slide dark" data-notes="How did we build it? Then, it took a wall sextant and years of watching the sky. Now we have laser altimetry and a JPL ephemeris. Four parts. First, the positions of the Sun and Earth come from JPL's DE421 ephemeris, every three hours from November 2026 to December 2030. Second, terrain: from the LOLA elevation model at 240 metres we computed the local horizon in 1,440 directions for seven polar sites, including the Moon's curvature. Third, a 3D view: 38 by 38 kilometres around the site, with sunlight and shadows at the chosen time. It is an illustration — the visibility numbers use the full horizon, out to the edge of the map. Fourth, a Python pipeline with tests, and a page in plain HTML and JavaScript.">
+    <div class="thread"><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><path d="M4,10 A20,20 0 0 0 20,25" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24,3 L10,19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="3" r="2.5" fill="currentColor"/></svg><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="22" height="22" rx="2"/><path d="M3,10.3 H25 M3,17.6 H25 M10.3,3 V25 M17.6,3 V25"/></g><rect x="11.3" y="11.3" width="5.3" height="5.3" fill="currentColor"/></svg><span class="kicker">Data and method</span><span class="th">Then: a wall sextant and years of watching the sky. Now: laser altimetry and a JPL ephemeris.</span></div>
     <h2>Real lunar terrain. Real astronomical positions.</h2>
-    <div class="row">
-      <div class="col" style="flex:1.35; justify-content:center"><img class="shot" src="img/terrain3d.jpg" alt="3-D view of 38 by 38 km of LOLA terrain around the IM-2 site, lit by the Sun, with arrows to the Sun and Earth."></div>
-      <div class="col" style="flex:1; justify-content:center; gap:14px">
-        <p style="font-size:24px"><b>1 · Celestial positions.</b> JPL DE421 ephemeris: Sun and Earth every 3 hours, Nov 2026 – Dec 2030.</p>
-        <p style="font-size:24px"><b>2 · Terrain analysis.</b> NASA LRO LOLA elevation model, 240 m: local horizon in 1,440 directions for 7 polar sites, Moon's curvature included.</p>
-        <p style="font-size:24px"><b>3 · 3D visualization.</b> 38 × 38 km around the selected site, with sunlight and shadows at the chosen time.</p>
-        <p style="font-size:24px"><b>4 · Implementation.</b> Python data pipeline with tests; front end in HTML and JavaScript.</p>
-      </div>
+    <div style="display:flex; justify-content:center"><div class="crop" style="width:1180px; height:330px"><img src="img/terrain3d.jpg" style="width:1290px; margin:-92px 0 0 -55px" alt="3D view of 38 by 38 km of LOLA terrain around the IM-2 site, lit by the Sun, with arrows to the Sun and Earth."></div></div>
+    <div class="four">
+      <div><b>1 · Positions</b>JPL DE421 ephemeris, every 3 hours, to Dec 2030</div>
+      <div><b>2 · Terrain</b>NASA LRO LOLA, 240 m: horizon in 1,440 directions</div>
+      <div><b>3 · 3D view</b>38 × 38 km around the site, lit at the chosen time</div>
+      <div><b>4 · Code</b>Python pipeline with tests; HTML and JavaScript page</div>
     </div>
     <div class="foot"><span>Visibility uses the horizon out to the edge of the LOLA map (75°S); the 3D scene shows only 38 × 38 km and is for illustration.</span><span>5 / 7</span></div>
   </section>
 
   <!-- 6 -->
-  <section class="slide" data-notes="How do we know the results are reliable? We checked the directions to the Sun and Earth against NASA JPL Horizons: two sites, six dates, twelve checks, all passed. The largest difference is 0.006 degrees, against a tolerance of 0.02. This check is on a smooth Moon — it validates the astronomy, not the terrain. And we are clear about the limits: each site is one point, not a region; the 240 metre terrain cannot resolve small ridges, so rise and set times can be off by hours; and we model geometric line of sight only — Earth above the horizon does not guarantee a link, and the Sun above the horizon does not guarantee power. This is not a flight-certified planning tool.">
-    <span class="kicker">Validated, with clear limitations</span>
+  <section class="slide" data-notes="Al-Khujandi's value for the tilt of Earth's axis was about two arcminutes too low — every instrument has limits. How do we know our results are reliable? We checked the directions to the Sun and Earth against NASA JPL Horizons: two sites, six dates, twelve checks, all passed. The largest difference is 0.006 degrees, against a tolerance of 0.02. This check is on a smooth Moon — it validates the astronomy, not the terrain. And we are clear about the limits: each site is one point, not a region; the 240 metre terrain cannot resolve small ridges, so rise and set times can be off by hours; and we model geometric line of sight only — Earth above the horizon does not guarantee a link, and the Sun above the horizon does not guarantee power. This is not a flight-certified planning tool.">
+    <div class="thread"><svg class="em" viewBox="0 0 28 28" aria-hidden="true"><path d="M4,10 A20,20 0 0 0 20,25" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24,3 L10,19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="3" r="2.5" fill="currentColor"/></svg><span class="kicker">Validated, with limits</span><span class="th">His tilt of Earth’s axis was about 2′ low. Every instrument has limits — here are ours.</span></div>
     <h2>12 of 12 checks against JPL Horizons passed</h2>
     <div class="row">
       <div class="col" style="flex:0.9; gap:16px">
@@ -199,31 +317,76 @@ a { color: var(--earth-ink); } .dark a { color: #9CCEFF; }
   </section>
 
   <!-- 7 -->
-  <section class="slide dark" data-notes="Our goal is to make this information easy to explore and understand. Scan the code and try it — on a phone or a laptop, no installation or login. Claude and Claude Code helped us build the page, the code and the data pipeline during the hackathon; we chose the problem, the sites and the design, and reviewed the results. Thank you!">
+  <section class="slide dark closing" data-notes="Our goal is to make this information easy to explore and understand. Scan the code and try it — on a phone or a laptop, no installation or login. Claude and Claude Code helped us build the page, the code and the data pipeline during the hackathon; we chose the problem, the sites and the design, and reviewed the results. One astronomer measured the Sun, one built a calendar — we carry both questions to the Moon. Rahmat — thank you!">
     <span class="kicker">Try Lunar Horizon</span>
-    <div class="row" style="flex:0; gap:56px; align-items:flex-start">
-      <div class="col" style="gap:20px">
-        <h2 style="font-size:50px">Explore the Moon. Plan the landing. See what changes when timing matters.</h2>
-        <p style="font-size:24px">No installation or login · any modern browser · add your own landing coordinates anywhere on the Moon.</p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 36px">
-          <p style="font-size:22px"><b>Data sources</b><br>NASA LRO LOLA · JPL DE421 · JPL Horizons · LROC</p>
-          <p style="font-size:22px"><b>Open source</b><br>github.com/Mehrafruz/lunar-horizon · MIT License</p>
-          <p style="font-size:22px; grid-column:1 / -1"><b>AI transparency</b><br>Claude and Claude Code (Anthropic) were used to develop the page, code and data pipeline during the hackathon. The team selected the problem, sites and design, and reviewed the results.</p>
-        </div>
+    <div class="row" style="flex:0; gap:60px; align-items:flex-start; margin-top:-6px">
+      <div class="col" style="flex:1; gap:16px">
+        <h1 class="rahmat">Rahmat!</h1>
+        <p style="font-size:27px; max-width:860px">Explore the Moon. Plan the landing. See what changes when timing matters.</p>
+        <p class="rubai-block">One measured how the Sun stood at midday;
+One built a calendar so none would stray.
+We carry both their questions to the Moon:
+How high the Sun — and which the landing day?</p>
+        <p style="font-size:19px; line-height:1.5"><b>Data:</b> NASA LRO LOLA · JPL DE421 · JPL Horizons · LROC. <b>Open source:</b> github.com/Mehrafruz/lunar-horizon · MIT License.</p>
       </div>
-      <div style="flex:none; display:flex; flex-direction:column; align-items:center; gap:14px">
-        <div style="background:#FFFFFF; border-radius:24px; padding:22px"><img src="img/qr.png" alt="QR code for https://mehrafruz.github.io/lunar-horizon/" style="width:280px; height:280px; display:block; image-rendering:pixelated"></div>
-        <a href="https://mehrafruz.github.io/lunar-horizon/" style="font-size:22px">mehrafruz.github.io/lunar-horizon</a>
+      <div class="col" style="flex:0 0 330px; gap:14px; align-items:center">
+        <div class="qrcard"><img src="img/qr.png" alt="QR code for https://mehrafruz.github.io/lunar-horizon/" style="width:280px; height:280px; display:block; image-rendering:pixelated"></div>
+        <a class="qrurl" href="https://mehrafruz.github.io/lunar-horizon/">mehrafruz.github.io/lunar-horizon</a>
+        <p style="font-size:17px; line-height:1.45; margin-top:6px"><b>AI transparency.</b> Claude and Claude Code (Anthropic) were used to develop the page, code and data pipeline. The team selected the problem, sites and design, and reviewed the results.</p>
       </div>
     </div>
-    <svg class="band" style="height:250px" viewBox="0 0 1600 250" preserveAspectRatio="none" aria-hidden="true">
-      <defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9AA3B3"/><stop offset="1" stop-color="#3E4656"/></linearGradient>
-        <radialGradient id="s7"><stop offset="0" stop-color="#FFE6A8" stop-opacity="0.9"/><stop offset="0.3" stop-color="#FFC24B" stop-opacity="0.35"/><stop offset="1" stop-color="#FFC24B" stop-opacity="0"/></radialGradient></defs>
-      <circle cx="300" cy="120" r="100" fill="url(#s7)"/><circle cx="300" cy="120" r="18" fill="#FFF3D1"/>
-      <path d="M0,250 L0,150 C120,132 220,164 330,146 C450,126 520,170 640,164 C760,158 820,128 940,138 C1060,148 1120,178 1240,170 C1360,162 1440,134 1600,140 L1600,250 Z" fill="url(#g7)"/>
-      <path d="M0,150 C120,132 220,164 330,146 C450,126 520,170 640,164 C760,158 820,128 940,138 C1060,148 1120,178 1240,170 C1360,162 1440,134 1600,140" fill="none" stroke="#E4E8EF" stroke-width="2.5"/>
-    </svg>
-    <div class="foot" style="position:relative; z-index:1; color:#F1F4F9"><span>Team CastorLab · Firdavs Khakimov · Mehrafruz Khakimova · NASA Space Apps Challenge 2026</span><span>7 / 7</span></div>
+    <svg class="hero7" viewBox="0 130 1600 310" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="hl7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BCC0C7"/><stop offset="1" stop-color="#5F6570"/></linearGradient>
+          <radialGradient id="hs7"><stop offset="0" stop-color="#FFE6A8" stop-opacity="0.85"/><stop offset="0.35" stop-color="#F0B44C" stop-opacity="0.3"/><stop offset="1" stop-color="#F0B44C" stop-opacity="0"/></radialGradient>
+          <radialGradient id="he7"><stop offset="0.6" stop-color="#7CC0FF" stop-opacity="0.45"/><stop offset="1" stop-color="#7CC0FF" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g transform="translate(0,176)">
+        <!-- astronomical graticule around the Sun, like an engraved instrument -->
+        <g fill="none" stroke="#D5B77A">
+          <circle cx="1290" cy="150" r="82" stroke-opacity="0.5" stroke-dasharray="2 7"/>
+          <circle cx="1290" cy="150" r="128" stroke-opacity="0.35"/>
+          <circle cx="1290" cy="150" r="172" stroke-opacity="0.22" stroke-dasharray="1 9"/>
+          <path d="M1100,150 H1480 M1290,0 V320" stroke-opacity="0.3"/>
+          <path d="M1162,150 h8 M1410,150 h8 M1290,22 v8 M1290,270 v8" stroke-opacity="0.7" stroke-width="2"/>
+        </g>
+        <circle cx="1290" cy="150" r="110" fill="url(#hs7)"/>
+        <circle cx="1290" cy="150" r="38" fill="#F0B44C" stroke="#D5B77A" stroke-width="2"/>
+        <circle cx="1290" cy="150" r="24" fill="#FFD98A"/>
+        </g>
+        <!-- Earth seen from the Moon, lit from the Sun's side -->
+        <path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(760,88) scale(1.1)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.8" transform="translate(620,140) scale(0.7)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(1110,70) scale(0.8)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.8" transform="translate(1500,300) scale(0.7)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="0.7" transform="translate(860,200) scale(0.6)"/><path d="M0,-12 C1.2,-2.4 2.4,-1.2 12,0 C2.4,1.2 1.2,2.4 0,12 C-1.2,2.4 -2.4,1.2 -12,0 C-2.4,-1.2 -1.2,-2.4 0,-12 Z" fill="#D5B77A" opacity="1" transform="translate(330,70) scale(0.9)"/>
+        <!-- the Pamir and an observatory: where the questions began -->
+        <g transform="translate(570,222) scale(0.95)"><path d="M0,0 C14,-16 40,-16 48,-2 C54,10 42,18 34,11 C28,6 33,-2 39,1" fill="none" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/><path d="M48,-2 H150" stroke="#D5B77A" stroke-width="2" stroke-linecap="round"/></g>
+        <path d="M0,360 L0,250 L70,190 L120,226 L200,140 L262,206 L330,170 L400,232 L470,200 L560,290 L600,360 Z" fill="#2A3756"/>
+        <path d="M0,360 L0,286 L90,226 L150,262 L238,178 L320,262 L380,236 L470,300 L540,360 Z" fill="#3B4A6B"/>
+        <g fill="#E8E1D3"><path d="M200,140 L226,168 L212,166 L200,178 L188,164 L176,168 Z"/><path d="M238,178 L262,202 L248,200 L238,212 L226,198 L216,202 Z"/><path d="M330,170 L352,192 L338,190 L330,200 L320,190 L308,192 Z"/><path d="M70,190 L88,206 L78,206 L70,214 L60,206 L52,208 Z"/></g>
+        <path d="M0,470 V352 C120,338 260,346 400,342 C470,340 520,348 570,358 C620,366 680,374 760,376 V470 Z" fill="#203238"/>
+        <g transform="translate(150,352)">
+          <rect x="0" y="-62" width="240" height="62" fill="#C8A06A" stroke="#8A6A3E" stroke-width="2"/>
+          <rect x="96" y="-94" width="48" height="94" fill="#C8A06A" stroke="#8A6A3E" stroke-width="2"/>
+          <path d="M92,-94 A28,28 0 0 1 148,-94 Z" fill="#D9B47E" stroke="#8A6A3E" stroke-width="2"/>
+          <path d="M24,-62 A16,16 0 0 1 56,-62 Z M184,-62 A16,16 0 0 1 216,-62 Z" fill="#D9B47E" stroke="#8A6A3E" stroke-width="2"/>
+          <g fill="#5C4326"><path d="M16,0 V-30 A9,9 0 0 1 34,-30 V0 Z"/><path d="M50,0 V-30 A9,9 0 0 1 68,-30 V0 Z"/><path d="M108,0 V-48 A12,12 0 0 1 132,-48 V0 Z"/><path d="M172,0 V-30 A9,9 0 0 1 190,-30 V0 Z"/><path d="M206,0 V-30 A9,9 0 0 1 224,-30 V0 Z"/></g>
+        </g>
+        <g fill="#1E4A4A"><ellipse cx="118" cy="318" rx="9" ry="42"/><ellipse cx="136" cy="326" rx="7" ry="32"/><ellipse cx="418" cy="320" rx="9" ry="40"/><ellipse cx="438" cy="328" rx="7" ry="30"/></g>
+        <!-- the Moon: grey regolith and a lander with a suzani panel -->
+        <path d="M330,470 C400,458 462,404 560,374 C680,342 820,346 980,352 C1140,358 1300,372 1430,346 C1500,334 1560,330 1600,332 V470 Z" fill="url(#hl7)"/>
+        <path d="M330,470 C400,458 462,404 560,374 C680,342 820,346 980,352 C1140,358 1300,372 1430,346 C1500,334 1560,330 1600,332" fill="none" stroke="#E8E1D3" stroke-width="2.5"/>
+        <g fill="#7C818B" opacity="0.55"><ellipse cx="700" cy="410" rx="34" ry="8"/><ellipse cx="1140" cy="410" rx="46" ry="10"/><ellipse cx="1340" cy="392" rx="22" ry="5"/><ellipse cx="880" cy="440" rx="28" ry="6"/></g>
+        <g transform="translate(960,352)">
+          <path d="M-46,-38 L-82,0 M46,-38 L82,0 M-30,-38 L-50,0 M30,-38 L50,0" stroke="#B58E55" stroke-width="5" stroke-linecap="round"/>
+          <ellipse cx="-82" cy="1" rx="12" ry="4" fill="#B58E55"/><ellipse cx="82" cy="1" rx="12" ry="4" fill="#B58E55"/>
+          <path d="M-58,-38 L58,-38 L50,-96 L-50,-96 Z" fill="#C9A85C" stroke="#141A26" stroke-width="2"/>
+          <rect x="-24" y="-88" width="48" height="42" fill="#E8E1D3" stroke="#141A26" stroke-width="2"/>
+          <g transform="translate(0,-67)"><rect x="-12" y="-12" width="24" height="24" fill="#A84D43" transform="rotate(45)"/><rect x="-6" y="-6" width="12" height="12" fill="#176B72" transform="rotate(45)"/><circle r="3" fill="#D5B77A"/></g>
+          <path d="M-40,-96 L40,-96 L32,-142 L-32,-142 Z" fill="#DCDDE0" stroke="#141A26" stroke-width="2"/>
+          <rect x="-16" y="-130" width="32" height="18" rx="2" fill="#13233F" stroke="#141A26" stroke-width="1.5"/>
+          <path d="M0,-142 L-6,-168" stroke="#141A26" stroke-width="2.5"/>
+          <ellipse cx="-12" cy="-176" rx="18" ry="8" fill="#E8E1D3" stroke="#141A26" stroke-width="2" transform="rotate(-28 -12 -176)"/>
+        </g>
+</svg>
+    <div class="foot7"><span>Team CastorLab, Tajikistan · Firdavs Khakimov · Mehrafruz Khakimova · NASA Space Apps Challenge 2026</span><span>7 / 7</span></div>
   </section>
 
 </div>
